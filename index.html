@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Demo · Sistema de Gestión de Cartera</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f4f2ec; --surface:#ffffff; --ink:#16201c; --muted:#5c6b64;
+    --line:#e4e0d6; --primary:#0f6e56; --primary-dark:#0a4d3c; --primary-soft:#e1f0ea;
+    --danger:#b3261e; --danger-soft:#fbe9e7; --amber:#9a6a00; --amber-soft:#fbf0d9;
+    --radius:14px; --radius-sm:10px;
+    --display:'Sora',system-ui,sans-serif; --body:'Inter',system-ui,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--body);background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased}
+  .app{display:flex;min-height:100vh}
+
+  /* ---- Sidebar ---- */
+  .side{width:248px;background:var(--primary-dark);color:#dff0e9;display:flex;flex-direction:column;flex-shrink:0}
+  .logo-zone{padding:20px 18px;border-bottom:1px solid rgba(255,255,255,.12)}
+  .logo-box{border:1.5px dashed rgba(255,255,255,.45);border-radius:var(--radius-sm);height:74px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;text-align:center;transition:.2s;overflow:hidden;background:rgba(255,255,255,.04)}
+  .logo-box:hover{border-color:#fff;background:rgba(255,255,255,.1)}
+  .logo-box span{font-size:11px;color:#bfe0d4;line-height:1.3}
+  .logo-box .up{font-size:20px;margin-bottom:3px}
+  .logo-box img{max-width:100%;max-height:74px;object-fit:contain}
+  .biz{margin-top:12px;font-family:var(--display);font-weight:600;font-size:15px;color:#fff}
+  .biz small{display:block;font-family:var(--body);font-weight:400;font-size:11px;color:#9fc7ba;margin-top:2px}
+  nav{padding:12px 10px;flex:1}
+  .nav-item{display:flex;align-items:center;gap:11px;padding:10px 13px;border-radius:var(--radius-sm);font-size:14px;color:#cfe6dd;cursor:pointer;margin-bottom:2px;transition:.15s;border:none;background:none;width:100%;text-align:left;font-family:var(--body)}
+  .nav-item:hover{background:rgba(255,255,255,.08);color:#fff}
+  .nav-item.active{background:var(--primary);color:#fff;font-weight:500}
+  .nav-item .ic{width:18px;text-align:center;font-size:15px}
+  .side-foot{padding:14px 18px;border-top:1px solid rgba(255,255,255,.12);font-size:11px;color:#8fbaad}
+
+  /* ---- Main ---- */
+  .main{flex:1;min-width:0;display:flex;flex-direction:column}
+  .topbar{height:62px;background:var(--surface);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 26px;position:sticky;top:0;z-index:5}
+  .topbar h1{font-family:var(--display);font-size:18px;font-weight:600}
+  .search{background:var(--bg);border:1px solid var(--line);border-radius:30px;padding:8px 16px;font-size:13px;width:260px;font-family:var(--body)}
+  .user{display:flex;align-items:center;gap:10px;font-size:13px}
+  .avatar{width:34px;height:34px;border-radius:50%;background:var(--primary-soft);color:var(--primary-dark);display:flex;align-items:center;justify-content:center;font-weight:600;font-size:13px;font-family:var(--display)}
+  .content{padding:26px;max-width:1180px;width:100%}
+  .view{display:none;animation:fade .3s ease}
+  .view.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+  /* ---- Cards / generic ---- */
+  .grid{display:grid;gap:16px}
+  .g4{grid-template-columns:repeat(4,1fr)}
+  .g3{grid-template-columns:repeat(3,1fr)}
+  .g2{grid-template-columns:repeat(2,1fr)}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px}
+  .stat .lbl{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+  .stat .val{font-family:var(--display);font-size:26px;font-weight:600;margin-top:6px}
+  .stat .sub{font-size:12px;color:var(--muted);margin-top:4px}
+  .val.bad{color:var(--danger)}
+  .sec-title{font-family:var(--display);font-size:15px;font-weight:600;margin:26px 0 14px}
+  .sec-title:first-child{margin-top:0}
+
+  table{width:100%;border-collapse:collapse;font-size:13.5px}
+  th{text-align:left;color:var(--muted);font-weight:500;font-size:12px;text-transform:uppercase;letter-spacing:.03em;padding:10px 12px;border-bottom:1px solid var(--line)}
+  td{padding:12px;border-bottom:1px solid var(--line)}
+  tr:last-child td{border-bottom:none}
+  .badge{font-size:11px;padding:4px 10px;border-radius:20px;font-weight:600;display:inline-block}
+  .b-ok{background:var(--primary-soft);color:var(--primary-dark)}
+  .b-warn{background:var(--amber-soft);color:var(--amber)}
+  .b-bad{background:var(--danger-soft);color:var(--danger)}
+  .cli{display:flex;align-items:center;gap:10px}
+  .ci{width:32px;height:32px;border-radius:50%;background:var(--bg);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:var(--muted)}
+
+  /* ---- Form ---- */
+  .form-row{margin-bottom:16px}
+  .form-row label{display:block;font-size:13px;font-weight:500;margin-bottom:6px;color:var(--ink)}
+  input,select{width:100%;padding:11px 13px;border:1px solid var(--line);border-radius:var(--radius-sm);font-size:14px;font-family:var(--body);background:var(--surface);color:var(--ink)}
+  input:focus,select:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-soft)}
+  .btn{background:var(--primary);color:#fff;border:none;padding:12px 20px;border-radius:var(--radius-sm);font-size:14px;font-weight:600;cursor:pointer;font-family:var(--body);transition:.15s}
+  .btn:hover{background:var(--primary-dark)}
+  .btn-ghost{background:transparent;border:1px solid var(--line);color:var(--ink)}
+  .btn-ghost:hover{background:var(--bg)}
+  .calc-out{background:var(--primary-soft);border-radius:var(--radius);padding:20px;margin-top:4px}
+  .calc-out .big{font-family:var(--display);font-size:30px;font-weight:700;color:var(--primary-dark)}
+  .calc-line{display:flex;justify-content:space-between;font-size:13px;padding:6px 0;color:var(--muted)}
+  .calc-line b{color:var(--ink)}
+
+  /* ---- Note / important ---- */
+  .note{border-left:3px solid var(--primary);background:var(--primary-soft);padding:12px 16px;border-radius:0 var(--radius-sm) var(--radius-sm) 0;font-size:13px;margin:10px 0;color:var(--primary-dark)}
+  .note.warn{border-color:var(--amber);background:var(--amber-soft);color:var(--amber)}
+
+  /* ---- Pricing ---- */
+  .price-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:8px}
+  .plan{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:26px}
+  .plan.feat{border:2px solid var(--primary)}
+  .plan .tag{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--primary);margin-bottom:10px}
+  .plan h3{font-family:var(--display);font-size:19px;margin-bottom:4px}
+  .plan .price{font-family:var(--display);font-size:32px;font-weight:700;margin:14px 0 2px}
+  .plan .price small{font-size:14px;font-weight:400;color:var(--muted)}
+  .plan ul{list-style:none;margin:16px 0;font-size:13.5px}
+  .plan li{padding:7px 0;padding-left:24px;position:relative;color:var(--ink)}
+  .plan li::before{content:"✓";position:absolute;left:0;color:var(--primary);font-weight:700}
+  .plan .who{font-size:12.5px;color:var(--muted);margin-top:12px;font-style:italic}
+
+  .hamburger{display:none;background:none;border:1px solid var(--line);border-radius:var(--radius-sm);font-size:20px;padding:4px 10px;cursor:pointer;color:var(--ink);margin-right:10px}
+  .demo-flag{background:#16201c;color:#fff;font-size:12px;text-align:center;padding:7px;font-family:var(--display);letter-spacing:.03em}
+  @media(max-width:860px){
+    .side{display:none;position:fixed;top:0;left:0;width:270px;height:100vh;z-index:100;box-shadow:4px 0 20px rgba(0,0,0,.3)}
+    .side.open{display:flex}
+    .hamburger{display:block}
+    .g4,.g3,.g2,.price-grid{grid-template-columns:1fr}
+    .content{padding:16px}
+    .search{display:none}
+  }
+</style>
+</head>
+<body>
+<div class="demo-flag">DEMO · Sistema de Gestión de Cartera — versión de muestra (datos ficticios)</div>
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <aside class="side">
+    <div class="logo-zone">
+      <div class="logo-box" id="logoBox" onclick="document.getElementById('logoIn').click()">
+        <div class="up">⬆</div>
+        <span>Tu logo aquí<br>(clic para subir)</span>
+      </div>
+      <input type="file" id="logoIn" accept="image/*" style="display:none" onchange="loadLogo(event)">
+      <div class="biz">Financiera del Norte<small>Sucursal Cd. Juárez</small></div>
+    </div>
+    <nav id="nav">
+      <button class="nav-item active" data-v="panel"><span class="ic">▦</span> Panel</button>
+      <button class="nav-item" data-v="clientes"><span class="ic">☺</span> Clientes</button>
+      <button class="nav-item" data-v="nuevo"><span class="ic">＋</span> Nuevo crédito</button>
+      <button class="nav-item" data-v="cobranza"><span class="ic">$</span> Cobranza</button>
+      <button class="nav-item" data-v="mora"><span class="ic">!</span> Mora</button>
+      <button class="nav-item" data-v="reportes"><span class="ic">▤</span> Reportes</button>
+      <button class="nav-item" data-v="config"><span class="ic">⚙</span> Configuración</button>
+    </nav>
+    <div class="side-foot">Acceso por usuario y permisos · Respaldo diario</div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="topbar">
+      <button class="hamburger" id="menuBtn" onclick="document.querySelector('.side').classList.toggle('open')">☰</button>
+      <h1 id="vtitle">Panel general</h1>
+      <input class="search" placeholder="Buscar cliente, crédito o folio…">
+      <div class="user"><div class="avatar">LM</div> Lorena M.</div>
+    </div>
+    <div class="content">
+
+      <!-- PANEL -->
+      <section class="view active" id="panel">
+        <div class="grid g4">
+          <div class="card stat"><div class="lbl">Cartera total</div><div class="val">$1,248,500</div><div class="sub">312 créditos activos</div></div>
+          <div class="card stat"><div class="lbl">En mora</div><div class="val bad">$84,300</div><div class="sub">6.7% de la cartera</div></div>
+          <div class="card stat"><div class="lbl">Desembolsado (mes)</div><div class="val">$312,000</div><div class="sub">28 créditos nuevos</div></div>
+          <div class="card stat"><div class="lbl">Cobrado (hoy)</div><div class="val">$41,650</div><div class="sub">37 abonos registrados</div></div>
+        </div>
+
+        <div class="sec-title">Pagos programados para hoy</div>
+        <div class="card" style="padding:0;overflow:hidden">
+          <table>
+            <thead><tr><th>Cliente</th><th>Crédito</th><th>Frecuencia</th><th>Monto</th><th>Estado</th></tr></thead>
+            <tbody>
+              <tr><td><div class="cli"><div class="ci">JR</div> Juan Ramírez</div></td><td>#1042</td><td>Semanal</td><td>$850</td><td><span class="badge b-ok">Al corriente</span></td></tr>
+              <tr><td><div class="cli"><div class="ci">MG</div> María González</div></td><td>#0987</td><td>Quincenal</td><td>$1,200</td><td><span class="badge b-warn">Vence hoy</span></td></tr>
+              <tr><td><div class="cli"><div class="ci">PL</div> Pedro López</div></td><td>#1110</td><td>Semanal</td><td>$1,500 + mora</td><td><span class="badge b-bad">6 días atraso</span></td></tr>
+              <tr><td><div class="cli"><div class="ci">AS</div> Ana Soto</div></td><td>#1201</td><td>Mensual</td><td>$3,400</td><td><span class="badge b-ok">Al corriente</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- CLIENTES -->
+      <section class="view" id="clientes">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+          <input class="search" placeholder="Buscar por nombre, teléfono o folio…" style="width:320px">
+          <button class="btn" onclick="go('nuevo')">＋ Nuevo cliente</button>
+        </div>
+        <div class="card" style="padding:0;overflow:hidden">
+          <table>
+            <thead><tr><th>Cliente</th><th>Teléfono</th><th>Créditos</th><th>Saldo</th><th>Cobrador</th><th>Estado</th></tr></thead>
+            <tbody>
+              <tr><td><div class="cli"><div class="ci">JR</div> Juan Ramírez</div></td><td>656 123 4567</td><td>1 activo</td><td>$12,400</td><td>Carlos V.</td><td><span class="badge b-ok">Al corriente</span></td></tr>
+              <tr><td><div class="cli"><div class="ci">MG</div> María González</div></td><td>656 222 8890</td><td>2 activos</td><td>$28,900</td><td>Carlos V.</td><td><span class="badge b-warn">Por vencer</span></td></tr>
+              <tr><td><div class="cli"><div class="ci">PL</div> Pedro López</div></td><td>656 445 1120</td><td>1 activo</td><td>$9,800</td><td>Diana R.</td><td><span class="badge b-bad">En mora</span></td></tr>
+              <tr><td><div class="cli"><div class="ci">AS</div> Ana Soto</div></td><td>656 778 2031</td><td>1 activo</td><td>$41,000</td><td>Diana R.</td><td><span class="badge b-ok">Al corriente</span></td></tr>
+              <tr><td><div class="cli"><div class="ci">RT</div> Roberto Tena</div></td><td>656 901 5567</td><td>3 activos</td><td>$67,200</td><td>Carlos V.</td><td><span class="badge b-ok">Al corriente</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="note">Cada cobrador solo ve los clientes que tiene asignados. El administrador ve toda la cartera.</div>
+      </section>
+
+      <!-- NUEVO CREDITO -->
+      <section class="view" id="nuevo">
+        <div class="grid g2" style="grid-template-columns:1fr 1fr;align-items:start">
+          <div class="card">
+            <div class="sec-title" style="margin-top:0">Datos del crédito</div>
+            <div class="form-row"><label>Cliente</label><select><option>Juan Ramírez</option><option>María González</option><option>+ Registrar nuevo cliente…</option></select></div>
+            <div class="form-row"><label>Monto a prestar (capital)</label><input type="number" id="cMonto" value="10000" oninput="calc()"></div>
+            <div class="grid g2">
+              <div class="form-row"><label>Plazo (número de pagos)</label><input type="number" id="cPlazo" value="12" oninput="calc()"></div>
+              <div class="form-row"><label>Frecuencia</label><select id="cFreq" onchange="calc()"><option value="Semanal">Semanal</option><option value="Quincenal">Quincenal</option><option value="Mensual" selected>Mensual</option></select></div>
+            </div>
+            <div class="grid g2">
+              <div class="form-row"><label>Tasa de interés (% por periodo)</label><input type="number" id="cTasa" value="8" oninput="calc()"></div>
+              <div class="form-row"><label>Fecha de inicio</label><input type="date" value="2026-05-30"></div>
+            </div>
+            <button class="btn" style="width:100%">Generar crédito y calendario de pagos</button>
+          </div>
+          <div class="card">
+            <div class="sec-title" style="margin-top:0">Resumen calculado</div>
+            <div class="calc-out">
+              <div style="font-size:12px;color:var(--primary-dark);font-weight:600">PAGO POR PERIODO</div>
+              <div class="big" id="oPago">$933</div>
+              <div style="margin-top:12px;border-top:1px solid rgba(15,110,86,.2);padding-top:10px">
+                <div class="calc-line"><span>Capital prestado</span><b id="oCap">$10,000</b></div>
+                <div class="calc-line"><span>Intereses totales</span><b id="oInt">$1,200</b></div>
+                <div class="calc-line"><span>Total a pagar</span><b id="oTot">$11,200</b></div>
+                <div class="calc-line"><span>Número de pagos</span><b id="oNum">12 mensuales</b></div>
+              </div>
+            </div>
+            <div class="note">El sistema genera el calendario completo y calcula la <b>mora automáticamente</b> cuando un pago se atrasa, según la regla que configures.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- COBRANZA -->
+      <section class="view" id="cobranza">
+        <div class="grid g3">
+          <div class="card stat"><div class="lbl">Por cobrar hoy</div><div class="val">$58,300</div></div>
+          <div class="card stat"><div class="lbl">Cobrado hoy</div><div class="val">$41,650</div></div>
+          <div class="card stat"><div class="lbl">Pendiente</div><div class="val bad">$16,650</div></div>
+        </div>
+        <div class="sec-title">Registrar abono rápido</div>
+        <div class="card">
+          <div class="grid g3" style="align-items:end">
+            <div class="form-row" style="margin:0"><label>Cliente / crédito</label><select><option>Juan Ramírez · #1042</option><option>María González · #0987</option></select></div>
+            <div class="form-row" style="margin:0"><label>Monto del abono</label><input type="number" value="850"></div>
+            <button class="btn">Registrar pago</button>
+          </div>
+          <div class="note" style="margin-bottom:0">Genera recibo en PDF con tu logo, listo para enviar por WhatsApp. Actualiza el saldo al instante.</div>
+        </div>
+        <div class="sec-title">Ruta del cobrador · Carlos V.</div>
+        <div class="card" style="padding:0;overflow:hidden">
+          <table>
+            <thead><tr><th>Orden</th><th>Cliente</th><th>Zona</th><th>Monto</th><th>Estado</th></tr></thead>
+            <tbody>
+              <tr><td>1</td><td>Juan Ramírez</td><td>Pronaf</td><td>$850</td><td><span class="badge b-ok">Cobrado</span></td></tr>
+              <tr><td>2</td><td>María González</td><td>Centro</td><td>$1,200</td><td><span class="badge b-warn">Pendiente</span></td></tr>
+              <tr><td>3</td><td>Roberto Tena</td><td>Centro</td><td>$2,100</td><td><span class="badge b-warn">Pendiente</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- MORA -->
+      <section class="view" id="mora">
+        <div class="grid g3">
+          <div class="card stat"><div class="lbl">Total en mora</div><div class="val bad">$84,300</div></div>
+          <div class="card stat"><div class="lbl">Clientes morosos</div><div class="val">19</div></div>
+          <div class="card stat"><div class="lbl">Mora promedio</div><div class="val">8 días</div></div>
+        </div>
+        <div class="sec-title">Cartera vencida</div>
+        <div class="card" style="padding:0;overflow:hidden">
+          <table>
+            <thead><tr><th>Cliente</th><th>Crédito</th><th>Días atraso</th><th>Saldo vencido</th><th>Interés moratorio</th><th>Acción</th></tr></thead>
+            <tbody>
+              <tr><td><div class="cli"><div class="ci">PL</div> Pedro López</div></td><td>#1110</td><td><span class="badge b-bad">6 días</span></td><td>$1,500</td><td>$90</td><td><button class="btn btn-ghost" style="padding:6px 12px;font-size:12px">Recordatorio</button></td></tr>
+              <tr><td><div class="cli"><div class="ci">EM</div> Elena Mora</div></td><td>#0876</td><td><span class="badge b-bad">14 días</span></td><td>$3,200</td><td>$268</td><td><button class="btn btn-ghost" style="padding:6px 12px;font-size:12px">Recordatorio</button></td></tr>
+              <tr><td><div class="cli"><div class="ci">JT</div> Jorge Téllez</div></td><td>#0791</td><td><span class="badge b-bad">22 días</span></td><td>$5,600</td><td>$616</td><td><button class="btn btn-ghost" style="padding:6px 12px;font-size:12px">Recordatorio</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="note warn">El interés moratorio se calcula solo, día por día, según la tasa que configures. Puedes mandar recordatorios masivos por WhatsApp/SMS.</div>
+      </section>
+
+      <!-- REPORTES -->
+      <section class="view" id="reportes">
+        <div class="sec-title" style="margin-top:0">Reportes disponibles</div>
+        <div class="grid g3">
+          <div class="card"><b>📊 Estado de cartera</b><p style="font-size:13px;color:var(--muted);margin-top:8px">Total prestado, cobrado, por cobrar y en mora, por periodo.</p></div>
+          <div class="card"><b>📉 Reporte de morosidad</b><p style="font-size:13px;color:var(--muted);margin-top:8px">Clientes vencidos, días de atraso y montos moratorios.</p></div>
+          <div class="card"><b>👤 Desempeño por cobrador</b><p style="font-size:13px;color:var(--muted);margin-top:8px">Cuánto cobró cada quien, % de recuperación.</p></div>
+          <div class="card"><b>💸 Desembolsos</b><p style="font-size:13px;color:var(--muted);margin-top:8px">Créditos otorgados por fecha, monto y sucursal.</p></div>
+          <div class="card"><b>📄 Estado de cuenta por cliente</b><p style="font-size:13px;color:var(--muted);margin-top:8px">Historial completo de pagos en PDF con tu logo.</p></div>
+          <div class="card"><b>📈 Flujo de efectivo proyectado</b><p style="font-size:13px;color:var(--muted);margin-top:8px">Cuánto se espera cobrar las próximas semanas.</p></div>
+        </div>
+        <div class="note">Todos los reportes se exportan a Excel/PDF. Se pueden agregar reportes a la medida del negocio.</div>
+      </section>
+
+      <!-- CONFIG -->
+      <section class="view" id="config">
+        <div class="grid g2" style="align-items:start">
+          <div class="card">
+            <div class="sec-title" style="margin-top:0">Identidad del negocio</div>
+            <div class="form-row"><label>Nombre de la financiera</label><input value="Financiera del Norte"></div>
+            <div class="form-row"><label>Logo (aparece en el sistema y en los recibos)</label>
+              <button class="btn btn-ghost" onclick="document.getElementById('logoIn').click()">Subir logo</button></div>
+            <div class="form-row"><label>Color principal</label><input type="color" value="#0f6e56" style="height:44px" onchange="document.documentElement.style.setProperty('--primary',this.value)"></div>
+          </div>
+          <div class="card">
+            <div class="sec-title" style="margin-top:0">Reglas de crédito y mora</div>
+            <div class="form-row"><label>Tasa de interés por defecto (%)</label><input type="number" value="8"></div>
+            <div class="form-row"><label>Tasa moratoria diaria (%)</label><input type="number" value="1"></div>
+            <div class="form-row"><label>Días de gracia antes de mora</label><input type="number" value="1"></div>
+          </div>
+          <div class="card">
+            <div class="sec-title" style="margin-top:0">Usuarios y permisos</div>
+            <table>
+              <thead><tr><th>Usuario</th><th>Rol</th><th>Acceso</th></tr></thead>
+              <tbody>
+                <tr><td>Lorena M.</td><td>Administrador</td><td>Todo</td></tr>
+                <tr><td>Carlos V.</td><td>Cobrador</td><td>Su cartera</td></tr>
+                <tr><td>Diana R.</td><td>Cobrador</td><td>Su cartera</td></tr>
+                <tr><td>Sofía P.</td><td>Capturista</td><td>Altas</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- PRECIOS -->
+      <section class="view" id="precios">
+        <p style="font-size:14px;color:var(--muted);margin-bottom:18px;max-width:680px">Mismo sistema, dos formas de adquirirlo. El costo del servidor (~$500 MXN/mes) corre por cuenta de la financiera y va a su nombre.</p>
+        <div class="price-grid">
+          <div class="plan">
+            <div class="tag">Opción A · Eres dueño</div>
+            <h3>Pago único + mantenimiento</h3>
+            <div class="price">$55,000 <small>MXN una sola vez</small></div>
+            <ul>
+              <li>Sistema completo a tu nombre</li>
+              <li>50% anticipo, 50% contra entrega</li>
+              <li>Entrega en 6–9 semanas</li>
+              <li>Capacitación incluida</li>
+              <li>Mantenimiento: $2,000 MXN/mes (opcional)</li>
+            </ul>
+            <div class="who">Ideal si quieren ser dueños del sistema y tienen el capital.</div>
+          </div>
+          <div class="plan feat">
+            <div class="tag">Opción B · Sin inversión fuerte</div>
+            <h3>Renta mensual (todo incluido)</h3>
+            <div class="price">$4,000 <small>MXN / mes</small></div>
+            <ul>
+              <li>Arranque único: $8,000 MXN</li>
+              <li>Servidor y respaldos incluidos</li>
+              <li>Soporte y actualizaciones incluidas</li>
+              <li>Sin gran desembolso inicial</li>
+              <li>Permanencia sugerida: 12 meses</li>
+            </ul>
+            <div class="who">Ideal para arrancar ya, pagando poco al inicio.</div>
+          </div>
+        </div>
+        <div class="note">Recomendación de venta: mostrar primero el sistema (las pestañas anteriores) y dejar esta de precios al final.</div>
+      </section>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  const titles={panel:'Panel general',clientes:'Clientes',nuevo:'Nuevo crédito',cobranza:'Cobranza',mora:'Cartera en mora',reportes:'Reportes',config:'Configuración',precios:'Planes y precios'};
+  function go(v){
+    document.querySelectorAll('.view').forEach(s=>s.classList.toggle('active',s.id===v));
+    document.querySelectorAll('.nav-item').forEach(b=>b.classList.toggle('active',b.dataset.v===v));
+    document.getElementById('vtitle').textContent=titles[v]||'';
+    window.scrollTo({top:0,behavior:'smooth'});
+    document.querySelector('.side').classList.remove('open');
+  }
+  document.getElementById('nav').addEventListener('click',e=>{const b=e.target.closest('.nav-item');if(b)go(b.dataset.v);});
+  function loadLogo(e){
+    const f=e.target.files[0];if(!f)return;
+    const r=new FileReader();
+    r.onload=ev=>{document.getElementById('logoBox').innerHTML='<img src="'+ev.target.result+'" alt="logo">';};
+    r.readAsDataURL(f);
+  }
+  const fmt=n=>'$'+Math.round(n).toLocaleString('es-MX');
+  function calc(){
+    const m=+document.getElementById('cMonto').value||0;
+    const p=+document.getElementById('cPlazo').value||1;
+    const t=(+document.getElementById('cTasa').value||0)/100;
+    const freq=document.getElementById('cFreq').value;
+    const interes=m*t*p;
+    const total=m+interes;
+    const pago=total/p;
+    document.getElementById('oPago').textContent=fmt(pago);
+    document.getElementById('oCap').textContent=fmt(m);
+    document.getElementById('oInt').textContent=fmt(interes);
+    document.getElementById('oTot').textContent=fmt(total);
+    document.getElementById('oNum').textContent=p+' '+freq.toLowerCase()+(p>1?'s':'');
+  }
+  calc();
+</script>
+</body>
+</html>
