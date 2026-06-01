@@ -3,395 +3,580 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Demo · Sistema de Gestión de Cartera</title>
+<title>Soluciones Financieras · Sistema de Cartera</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#f4f2ec; --surface:#ffffff; --ink:#16201c; --muted:#5c6b64;
-    --line:#e4e0d6; --primary:#0f6e56; --primary-dark:#0a4d3c; --primary-soft:#e1f0ea;
-    --danger:#b3261e; --danger-soft:#fbe9e7; --amber:#9a6a00; --amber-soft:#fbf0d9;
-    --radius:14px; --radius-sm:10px;
-    --display:'Sora',system-ui,sans-serif; --body:'Inter',system-ui,sans-serif;
+    --bg:#eef1f6;--surface:#fff;--ink:#0f1828;--muted:#667085;--faint:#9aa4b6;
+    --line:#e5e9f0;--sidebar:#101a31;--sidebar-2:#16233f;
+    --primary:#22376b;--primary-2:#2c4a8f;--primary-soft:#e8edf8;
+    --gold:#c8a44d;--gold-soft:#f7f0dd;
+    --ok:#15803d;--ok-soft:#e7f4ec;--danger:#b42318;--danger-soft:#fdeceb;--amber:#b54708;--amber-soft:#fdf0e6;
+    --r:16px;--r-sm:11px;
+    --display:'Sora',sans-serif;--body:'IBM Plex Sans',sans-serif;
+    --sh:0 1px 2px rgba(16,24,40,.04),0 4px 16px rgba(16,24,40,.05);--sh-lg:0 8px 30px rgba(16,24,40,.10);
   }
   *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:var(--body);background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased}
-  .app{display:flex;min-height:100vh}
-
-  /* ---- Sidebar ---- */
-  .side{width:248px;background:var(--primary-dark);color:#dff0e9;display:flex;flex-direction:column;flex-shrink:0}
-  .logo-zone{padding:20px 18px;border-bottom:1px solid rgba(255,255,255,.12)}
-  .logo-box{border:1.5px dashed rgba(255,255,255,.45);border-radius:var(--radius-sm);height:74px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;text-align:center;transition:.2s;overflow:hidden;background:rgba(255,255,255,.04)}
-  .logo-box:hover{border-color:#fff;background:rgba(255,255,255,.1)}
-  .logo-box span{font-size:11px;color:#bfe0d4;line-height:1.3}
-  .logo-box .up{font-size:20px;margin-bottom:3px}
-  .logo-box img{max-width:100%;max-height:74px;object-fit:contain}
-  .biz{margin-top:12px;font-family:var(--display);font-weight:600;font-size:15px;color:#fff}
-  .biz small{display:block;font-family:var(--body);font-weight:400;font-size:11px;color:#9fc7ba;margin-top:2px}
-  nav{padding:12px 10px;flex:1}
-  .nav-item{display:flex;align-items:center;gap:11px;padding:10px 13px;border-radius:var(--radius-sm);font-size:14px;color:#cfe6dd;cursor:pointer;margin-bottom:2px;transition:.15s;border:none;background:none;width:100%;text-align:left;font-family:var(--body)}
-  .nav-item:hover{background:rgba(255,255,255,.08);color:#fff}
-  .nav-item.active{background:var(--primary);color:#fff;font-weight:500}
-  .nav-item .ic{width:18px;text-align:center;font-size:15px}
-  .side-foot{padding:14px 18px;border-top:1px solid rgba(255,255,255,.12);font-size:11px;color:#8fbaad}
-
-  /* ---- Main ---- */
+  body{font-family:var(--body);background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased;letter-spacing:-.01em}
+  svg.i{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+  .login{position:fixed;inset:0;background:radial-gradient(900px 500px at 80% -10%,#26406f 0%,transparent 60%),radial-gradient(700px 500px at -10% 110%,#1c2f57 0%,transparent 55%),var(--sidebar);display:flex;align-items:center;justify-content:center;z-index:200;padding:20px}
+  .login::before{content:"";position:absolute;inset:0;background-image:radial-gradient(rgba(255,255,255,.05) 1px,transparent 1px);background-size:22px 22px;opacity:.5}
+  .login-card{position:relative;background:var(--surface);border-radius:22px;padding:36px 32px;width:360px;box-shadow:0 30px 70px rgba(0,0,0,.4);text-align:center}
+  .login .logo-box{border:1.5px dashed var(--line);border-radius:14px;height:84px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;margin-bottom:8px;overflow:hidden;transition:.2s}
+  .login .logo-box:hover{border-color:var(--primary);background:var(--primary-soft)}
+  .login .logo-box small{font-size:11px;color:var(--faint)}
+  .login .logo-box img{max-width:100%;max-height:84px;object-fit:contain}
+  .login h2{font-family:var(--display);font-size:19px;font-weight:600;margin:16px 0 2px}
+  .login p{font-size:12.5px;color:var(--muted);margin-bottom:20px}
+  .login input{width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:var(--r-sm);font-size:14px;margin-bottom:11px;font-family:var(--body)}
+  .login input:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-soft)}
+  .login .hint{font-size:11px;color:var(--faint);margin-top:12px}
+  .gold-line{height:3px;width:40px;background:var(--gold);border-radius:3px;margin:0 auto}
+  .app{display:none;min-height:100vh}.app.show{display:flex}
+  .side{width:248px;background:var(--sidebar);color:#aebbd4;display:flex;flex-direction:column;flex-shrink:0}
+  .logo-zone{padding:20px 18px 16px;border-bottom:1px solid rgba(255,255,255,.08)}
+  .logo-box2{border:1.4px dashed rgba(255,255,255,.32);border-radius:12px;height:58px;display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;background:rgba(255,255,255,.04);transition:.2s}
+  .logo-box2:hover{border-color:var(--gold)}.logo-box2 small{font-size:10px;color:#8295b8}.logo-box2 img{max-width:100%;max-height:58px;object-fit:contain}
+  .biz{margin-top:12px;font-family:var(--display);font-weight:600;font-size:14.5px;color:#fff}
+  .biz small{display:block;font-family:var(--body);font-weight:400;font-size:11px;color:#7e90b4;margin-top:2px}
+  nav{padding:12px 12px;flex:1;overflow-y:auto}
+  .nav-label{font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:#5e6f90;padding:0 12px;margin:12px 0 7px}
+  .nav-item{display:flex;align-items:center;gap:12px;padding:9px 12px;border-radius:10px;font-size:13.5px;color:#aebbd4;cursor:pointer;margin-bottom:2px;border:none;background:none;width:100%;text-align:left;font-family:var(--body);font-weight:500;position:relative;transition:.16s}
+  .nav-item:hover{background:rgba(255,255,255,.06);color:#fff}
+  .nav-item.active{background:linear-gradient(90deg,var(--sidebar-2),rgba(44,74,143,.25));color:#fff}
+  .nav-item.active::before{content:"";position:absolute;left:0;top:7px;bottom:7px;width:3px;background:var(--gold);border-radius:3px}
+  .side-foot{padding:13px 18px;border-top:1px solid rgba(255,255,255,.08);font-size:11px;color:#6c7e9f;display:flex;align-items:center;gap:7px}
   .main{flex:1;min-width:0;display:flex;flex-direction:column}
-  .topbar{height:62px;background:var(--surface);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 26px;position:sticky;top:0;z-index:5}
+  .topbar{height:66px;background:rgba(255,255,255,.85);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 28px;position:sticky;top:0;z-index:5}
   .topbar h1{font-family:var(--display);font-size:18px;font-weight:600}
-  .search{background:var(--bg);border:1px solid var(--line);border-radius:30px;padding:8px 16px;font-size:13px;width:260px;font-family:var(--body)}
-  .user{display:flex;align-items:center;gap:10px;font-size:13px}
-  .avatar{width:34px;height:34px;border-radius:50%;background:var(--primary-soft);color:var(--primary-dark);display:flex;align-items:center;justify-content:center;font-weight:600;font-size:13px;font-family:var(--display)}
-  .content{padding:26px;max-width:1180px;width:100%}
-  .view{display:none;animation:fade .3s ease}
-  .view.active{display:block}
-  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-
-  /* ---- Cards / generic ---- */
-  .grid{display:grid;gap:16px}
-  .g4{grid-template-columns:repeat(4,1fr)}
-  .g3{grid-template-columns:repeat(3,1fr)}
-  .g2{grid-template-columns:repeat(2,1fr)}
-  .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px}
-  .stat .lbl{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
-  .stat .val{font-family:var(--display);font-size:26px;font-weight:600;margin-top:6px}
-  .stat .sub{font-size:12px;color:var(--muted);margin-top:4px}
-  .val.bad{color:var(--danger)}
-  .sec-title{font-family:var(--display);font-size:15px;font-weight:600;margin:26px 0 14px}
+  .topbar .crumb{font-size:12px;color:var(--faint);margin-top:1px;font-weight:400}
+  .hamburger{display:none;background:none;border:1px solid var(--line);border-radius:9px;padding:5px 9px;cursor:pointer;color:var(--ink);margin-right:12px}
+  .top-r{display:flex;align-items:center;gap:16px}
+  .bell{position:relative;color:var(--muted);cursor:pointer}.bell .dot{position:absolute;top:-2px;right:-2px;width:7px;height:7px;background:var(--danger);border-radius:50%;border:1.5px solid #fff}
+  .role-pill{font-size:11px;background:var(--gold-soft);color:#8a6d1e;padding:3px 10px;border-radius:20px;font-weight:600}
+  .avatar{width:38px;height:38px;border-radius:11px;background:linear-gradient(135deg,var(--primary),var(--primary-2));color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:13px;font-family:var(--display)}
+  .content{padding:24px 28px;max-width:1220px;width:100%}
+  .view{display:none}.view.active{display:block}
+  .view.active>*{opacity:0;transform:translateY(10px);animation:rise .5s cubic-bezier(.2,.7,.3,1) forwards}
+  .view.active>*:nth-child(1){animation-delay:.02s}.view.active>*:nth-child(2){animation-delay:.07s}.view.active>*:nth-child(3){animation-delay:.12s}.view.active>*:nth-child(4){animation-delay:.17s}.view.active>*:nth-child(5){animation-delay:.22s}.view.active>*:nth-child(6){animation-delay:.27s}
+  @keyframes rise{to{opacity:1;transform:none}}
+  .grid{display:grid;gap:16px}.g4{grid-template-columns:repeat(4,1fr)}.g3{grid-template-columns:repeat(3,1fr)}.g2{grid-template-columns:repeat(2,1fr)}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:20px;box-shadow:var(--sh)}
+  .kpi .ico{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:var(--primary-soft);color:var(--primary)}
+  .kpi .ico.g{background:var(--ok-soft);color:var(--ok)}.kpi .ico.r{background:var(--danger-soft);color:var(--danger)}.kpi .ico.a{background:var(--amber-soft);color:var(--amber)}
+  .kpi .lbl{font-size:12px;color:var(--muted);margin-top:13px}
+  .kpi .val{font-family:var(--display);font-size:23px;font-weight:600;margin-top:3px;letter-spacing:-.02em}
+  .val.bad{color:var(--danger)}.val.good{color:var(--ok)}
+  .trend{display:inline-flex;align-items:center;gap:3px;font-size:11px;font-weight:600;margin-top:7px;padding:2px 7px;border-radius:6px}
+  .trend.up{background:var(--ok-soft);color:var(--ok)}.trend.down{background:var(--danger-soft);color:var(--danger)}.trend.n{background:var(--bg);color:var(--muted)}
+  .sec-title{font-family:var(--display);font-size:15.5px;font-weight:600;margin:24px 0 14px;display:flex;align-items:center;gap:8px}
   .sec-title:first-child{margin-top:0}
-
-  table{width:100%;border-collapse:collapse;font-size:13.5px}
-  th{text-align:left;color:var(--muted);font-weight:500;font-size:12px;text-transform:uppercase;letter-spacing:.03em;padding:10px 12px;border-bottom:1px solid var(--line)}
-  td{padding:12px;border-bottom:1px solid var(--line)}
-  tr:last-child td{border-bottom:none}
-  .badge{font-size:11px;padding:4px 10px;border-radius:20px;font-weight:600;display:inline-block}
-  .b-ok{background:var(--primary-soft);color:var(--primary-dark)}
-  .b-warn{background:var(--amber-soft);color:var(--amber)}
-  .b-bad{background:var(--danger-soft);color:var(--danger)}
-  .cli{display:flex;align-items:center;gap:10px}
-  .ci{width:32px;height:32px;border-radius:50%;background:var(--bg);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:var(--muted)}
-
-  /* ---- Form ---- */
-  .form-row{margin-bottom:16px}
-  .form-row label{display:block;font-size:13px;font-weight:500;margin-bottom:6px;color:var(--ink)}
-  input,select{width:100%;padding:11px 13px;border:1px solid var(--line);border-radius:var(--radius-sm);font-size:14px;font-family:var(--body);background:var(--surface);color:var(--ink)}
+  .panel-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:12px;flex-wrap:wrap}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th{text-align:left;color:var(--muted);font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:.04em;padding:11px 13px;border-bottom:1px solid var(--line);white-space:nowrap}
+  td{padding:12px 13px;border-bottom:1px solid var(--line)}
+  tbody tr{transition:.12s}tbody tr:hover{background:#f8fafc}tr:last-child td{border-bottom:none}
+  .badge{font-size:11px;padding:4px 11px;border-radius:20px;font-weight:600;display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+  .badge::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor;opacity:.8}
+  .b-ok{background:var(--ok-soft);color:var(--ok)}.b-warn{background:var(--amber-soft);color:var(--amber)}.b-bad{background:var(--danger-soft);color:var(--danger)}.b-n{background:var(--primary-soft);color:var(--primary)}
+  .cli{display:flex;align-items:center;gap:11px}
+  .ci{width:34px;height:34px;border-radius:10px;background:var(--primary-soft);color:var(--primary);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;font-family:var(--display);flex-shrink:0}
+  .pos{color:var(--ok);font-weight:600}.neg{color:var(--danger);font-weight:600}
+  .form-row{margin-bottom:15px}.form-row label{display:block;font-size:13px;font-weight:500;margin-bottom:6px}
+  input,select{width:100%;padding:11px 13px;border:1px solid var(--line);border-radius:var(--r-sm);font-size:14px;font-family:var(--body);background:var(--surface);color:var(--ink);transition:.15s}
   input:focus,select:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-soft)}
-  .btn{background:var(--primary);color:#fff;border:none;padding:12px 20px;border-radius:var(--radius-sm);font-size:14px;font-weight:600;cursor:pointer;font-family:var(--body);transition:.15s}
-  .btn:hover{background:var(--primary-dark)}
-  .btn-ghost{background:transparent;border:1px solid var(--line);color:var(--ink)}
-  .btn-ghost:hover{background:var(--bg)}
-  .calc-out{background:var(--primary-soft);border-radius:var(--radius);padding:20px;margin-top:4px}
-  .calc-out .big{font-family:var(--display);font-size:30px;font-weight:700;color:var(--primary-dark)}
-  .calc-line{display:flex;justify-content:space-between;font-size:13px;padding:6px 0;color:var(--muted)}
-  .calc-line b{color:var(--ink)}
-
-  /* ---- Note / important ---- */
-  .note{border-left:3px solid var(--primary);background:var(--primary-soft);padding:12px 16px;border-radius:0 var(--radius-sm) var(--radius-sm) 0;font-size:13px;margin:10px 0;color:var(--primary-dark)}
-  .note.warn{border-color:var(--amber);background:var(--amber-soft);color:var(--amber)}
-
-  /* ---- Pricing ---- */
-  .price-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:8px}
-  .plan{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:26px}
-  .plan.feat{border:2px solid var(--primary)}
-  .plan .tag{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--primary);margin-bottom:10px}
-  .plan h3{font-family:var(--display);font-size:19px;margin-bottom:4px}
-  .plan .price{font-family:var(--display);font-size:32px;font-weight:700;margin:14px 0 2px}
-  .plan .price small{font-size:14px;font-weight:400;color:var(--muted)}
-  .plan ul{list-style:none;margin:16px 0;font-size:13.5px}
-  .plan li{padding:7px 0;padding-left:24px;position:relative;color:var(--ink)}
-  .plan li::before{content:"✓";position:absolute;left:0;color:var(--primary);font-weight:700}
-  .plan .who{font-size:12.5px;color:var(--muted);margin-top:12px;font-style:italic}
-
-  .hamburger{display:none;background:none;border:1px solid var(--line);border-radius:var(--radius-sm);font-size:20px;padding:4px 10px;cursor:pointer;color:var(--ink);margin-right:10px}
-  .demo-flag{background:#16201c;color:#fff;font-size:12px;text-align:center;padding:7px;font-family:var(--display);letter-spacing:.03em}
-  @media(max-width:860px){
-    .side{display:none;position:fixed;top:0;left:0;width:270px;height:100vh;z-index:100;box-shadow:4px 0 20px rgba(0,0,0,.3)}
-    .side.open{display:flex}
-    .hamburger{display:block}
-    .g4,.g3,.g2,.price-grid{grid-template-columns:1fr}
-    .content{padding:16px}
-    .search{display:none}
-  }
+  .btn{background:var(--primary);color:#fff;border:none;padding:11px 18px;border-radius:var(--r-sm);font-size:13.5px;font-weight:600;cursor:pointer;font-family:var(--body);display:inline-flex;align-items:center;gap:8px;transition:.16s;box-shadow:0 1px 2px rgba(34,55,107,.2)}
+  .btn:hover{background:var(--primary-2);transform:translateY(-1px)}
+  .btn-ghost{background:transparent;border:1px solid var(--line);color:var(--ink);box-shadow:none}.btn-ghost:hover{background:var(--bg)}
+  .btn-sm{padding:7px 12px;font-size:12px}
+  .btn-gold{background:#fff;color:#8a6d1e;border:1px solid var(--gold)}.btn-gold:hover{background:var(--gold-soft)}
+  .calc-out{background:linear-gradient(160deg,#f4f7fc,#eaf0fa);border:1px solid var(--line);border-radius:var(--r);padding:20px}
+  .calc-out .big{font-family:var(--display);font-size:30px;font-weight:700;color:var(--primary);letter-spacing:-.02em}
+  .calc-line{display:flex;justify-content:space-between;font-size:13px;padding:6px 0;color:var(--muted)}.calc-line b{color:var(--ink)}
+  .note{border-left:3px solid var(--primary);background:var(--primary-soft);padding:12px 15px;border-radius:0 var(--r-sm) var(--r-sm) 0;font-size:13px;margin:12px 0;color:#2a3a5e}
+  .note.warn{border-color:var(--amber);background:var(--amber-soft);color:#7a3d0a}
+  .chip{display:inline-flex;align-items:center;gap:5px;font-size:12.5px;background:var(--bg);border:1px solid var(--line);border-radius:20px;padding:6px 13px;margin:3px 4px 0 0;cursor:pointer}.chip:hover{border-color:var(--primary);color:var(--primary)}
+  .seg{display:inline-flex;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:3px;gap:2px;flex-wrap:wrap}
+  .seg button{border:none;background:none;padding:7px 13px;border-radius:8px;font-size:12.5px;font-family:var(--body);cursor:pointer;color:var(--muted);font-weight:500}
+  .seg button.on{background:var(--surface);color:var(--primary);box-shadow:var(--sh)}
+  .cuadre{background:linear-gradient(155deg,var(--sidebar),var(--primary));color:#fff;border-radius:var(--r);padding:24px;box-shadow:var(--sh-lg);position:relative;overflow:hidden}
+  .cuadre::after{content:"";position:absolute;right:-30px;top:-30px;width:140px;height:140px;border-radius:50%;background:rgba(200,164,77,.18)}
+  .cuadre .lbl{font-size:11.5px;color:#aebbd4;font-weight:600;letter-spacing:.05em}
+  .cuadre .big{font-family:var(--display);font-size:30px;font-weight:700;margin-top:4px}
+  .cuadre .row{display:flex;justify-content:space-between;font-size:13px;padding:5px 0;color:#c3cee4}.cuadre .row b{color:#fff}
+  .cuadre .ok{margin-top:12px;background:rgba(200,164,77,.22);border:1px solid rgba(200,164,77,.5);color:#f0dca5;border-radius:20px;padding:6px 13px;display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600}
+  .bar-row{display:flex;align-items:center;gap:12px;margin-bottom:13px}.bar-row .nm{width:64px;font-size:12.5px;color:var(--muted)}
+  .bar-track{flex:1;height:9px;background:var(--bg);border-radius:6px;overflow:hidden}.bar-fill{height:100%;border-radius:6px;background:linear-gradient(90deg,var(--primary),var(--primary-2))}
+  .bar-row .amt{font-size:12.5px;font-weight:600;width:74px;text-align:right}
+  .steps{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
+  .step{flex:1;min-width:150px;border:1px solid var(--line);border-radius:12px;padding:14px;display:flex;gap:11px;align-items:flex-start;background:var(--surface)}
+  .step .n{width:26px;height:26px;border-radius:8px;background:var(--primary-soft);color:var(--primary);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;font-family:var(--display);flex-shrink:0}
+  .step b{font-size:13.5px}.step p{font-size:12px;color:var(--muted);margin-top:3px}
+  .perm-grid{width:100%;border-collapse:collapse;font-size:12.5px}
+  .perm-grid th{text-align:center}.perm-grid td:first-child{text-align:left;font-weight:500}.perm-grid td{text-align:center;padding:9px 8px}
+  .yes{color:var(--ok);font-weight:700}.no{color:var(--faint)}
+  .disc{font-size:11px;color:var(--faint);text-align:center;padding:18px 10px;border-top:1px solid var(--line);margin-top:26px;line-height:1.5}
+  .explain{display:flex;gap:11px;background:linear-gradient(135deg,#eafaf1,#e3f4ea);border:1px solid #bfe6cf;border-left:3px solid var(--ok);border-radius:var(--r-sm);padding:13px 16px;margin-bottom:18px;font-size:13px;color:#14532d}
+  .explain svg{stroke:var(--ok);flex-shrink:0;margin-top:1px}
+  .explain b{color:#0f3d22}
+  .explain .add{display:block;margin-top:5px;font-size:12px;color:#3c7a55}
+  .tog{position:relative;width:38px;height:22px;border-radius:20px;background:#d3dae6;cursor:pointer;transition:.2s;flex-shrink:0;border:none}
+  .tog::after{content:"";position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;background:#fff;transition:.2s;box-shadow:0 1px 2px rgba(0,0,0,.2)}
+  .tog.on{background:var(--ok)}.tog.on::after{left:18px}
+  .tog.lock{background:var(--primary);cursor:not-allowed;opacity:.55}.tog.lock::after{left:18px}
+  .perm-card{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
+  .perm-card:last-child{border-bottom:none}
+  .perm-card .t{font-size:13.5px;font-weight:500}.perm-card .d{font-size:12px;color:var(--muted)}
+  .demo-flag{background:var(--ink);color:#fff;font-size:11.5px;text-align:center;padding:7px;font-family:var(--display);letter-spacing:.04em;font-weight:500}
+  @media(max-width:880px){.side{display:none;position:fixed;top:0;left:0;width:262px;height:100vh;z-index:100;box-shadow:6px 0 30px rgba(0,0,0,.35)}.side.open{display:flex}.hamburger{display:block}.g4,.g3,.g2{grid-template-columns:1fr}.content{padding:16px}.top-r .role-pill{display:none}.table-wrap{overflow-x:auto}}
 </style>
 </head>
 <body>
-<div class="demo-flag">DEMO · Sistema de Gestión de Cartera — versión de muestra (datos ficticios)</div>
-<div class="app">
-
-  <!-- SIDEBAR -->
-  <aside class="side">
-    <div class="logo-zone">
-      <div class="logo-box" id="logoBox" onclick="document.getElementById('logoIn').click()">
-        <div class="up">⬆</div>
-        <span>Tu logo aquí<br>(clic para subir)</span>
-      </div>
-      <input type="file" id="logoIn" accept="image/*" style="display:none" onchange="loadLogo(event)">
-      <div class="biz">Financiera del Norte<small>Sucursal Cd. Juárez</small></div>
+<div class="login" id="login">
+  <div class="login-card">
+    <div class="logo-box" onclick="document.getElementById('logoIn').click()">
+      <svg class="i" style="width:22px;height:22px;stroke:var(--faint);margin-bottom:4px" viewBox="0 0 24 24"><path d="M12 16V4M8 8l4-4 4 4"/><path d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2"/></svg>
+      <small>Tu logo aquí · clic para subir</small>
     </div>
+    <input type="file" id="logoIn" accept="image/*" style="display:none" onchange="loadLogo(event)">
+    <h2>Soluciones Financieras</h2><div class="gold-line"></div>
+    <p style="margin-top:8px">Sistema de Gestión de Cartera</p>
+    <input placeholder="Usuario" value="director"><input type="password" placeholder="Contraseña" value="••••••••">
+    <button class="btn" style="width:100%;justify-content:center" onclick="enter()">Entrar al sistema</button>
+    <div class="hint">Demo · solo da clic en Entrar</div>
+  </div>
+</div>
+<div class="app" id="app">
+  <div class="demo-flag" style="position:fixed;top:0;left:0;right:0;z-index:50">DEMO · datos de ejemplo</div>
+  <aside class="side" style="margin-top:31px">
+    <div class="logo-zone"><div class="logo-box2" onclick="document.getElementById('logoIn').click()" id="logoBox2"><small>Tu logo aquí</small></div><div class="biz">Soluciones Financieras<small>Cintalapa, Chiapas</small></div></div>
     <nav id="nav">
-      <button class="nav-item active" data-v="panel"><span class="ic">▦</span> Panel</button>
-      <button class="nav-item" data-v="clientes"><span class="ic">☺</span> Clientes</button>
-      <button class="nav-item" data-v="nuevo"><span class="ic">＋</span> Nuevo crédito</button>
-      <button class="nav-item" data-v="cobranza"><span class="ic">$</span> Cobranza</button>
-      <button class="nav-item" data-v="mora"><span class="ic">!</span> Mora</button>
-      <button class="nav-item" data-v="reportes"><span class="ic">▤</span> Reportes</button>
-      <button class="nav-item" data-v="config"><span class="ic">⚙</span> Configuración</button>
+      <div class="nav-label">Propuesta</div>
+      <button class="nav-item" data-v="beneficios"><svg class="i" viewBox="0 0 24 24"><path d="M12 2l2.4 5 5.6.8-4 4 1 5.6-5-2.7-5 2.7 1-5.6-4-4 5.6-.8z"/></svg> ¿Por qué a medida?</button>
+      <div class="nav-label">Operación</div>
+      <button class="nav-item active" data-v="panel"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/></svg> Panel del director</button>
+      <button class="nav-item" data-v="caja"><svg class="i" viewBox="0 0 24 24"><rect x="2.5" y="6" width="19" height="13" rx="2.5"/><path d="M16 12h2"/><path d="M2.5 10h19"/></svg> Corte de caja</button>
+      <button class="nav-item" data-v="venc"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg> Vencimientos del día</button>
+      <button class="nav-item" data-v="cartera"><svg class="i" viewBox="0 0 24 24"><path d="M3 7h18v12H3z"/><path d="M3 11h18"/><path d="M7 15h4"/></svg> Cartera</button>
+      <button class="nav-item" data-v="clientes"><svg class="i" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19a5.5 5.5 0 0111 0"/><path d="M16 6.5a3 3 0 010 5.5"/><path d="M17.5 19a5.5 5.5 0 00-2-4.2"/></svg> Clientes</button>
+      <button class="nav-item" data-v="nuevo"><svg class="i" viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V8z"/><path d="M14 3v5h5"/><path d="M12 18v-5M9.5 15.5h5"/></svg> Nuevo crédito</button>
+      <button class="nav-item" data-v="pagos"><svg class="i" viewBox="0 0 24 24"><path d="M3.5 12a8.5 8.5 0 1117 0 8.5 8.5 0 01-17 0z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg> Pagos</button>
+      <button class="nav-item" data-v="refi"><svg class="i" viewBox="0 0 24 24"><path d="M21 12a9 9 0 11-3-6.7M21 4v4h-4"/></svg> Refinanciamiento</button>
+      <button class="nav-item" data-v="mora"><svg class="i" viewBox="0 0 24 24"><path d="M10.3 3.6L2.5 17a2 2 0 001.7 3h15.6a2 2 0 001.7-3L13.7 3.6a2 2 0 00-3.4 0z"/><path d="M12 9v4M12 16.5v.5"/></svg> Mora</button>
+      <div class="nav-label">Análisis y administración</div>
+      <button class="nav-item" data-v="reportes"><svg class="i" viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg> Reportes</button>
+      <button class="nav-item" data-v="bitacora"><svg class="i" viewBox="0 0 24 24"><path d="M12 8v4l3 2"/><circle cx="12" cy="12" r="9"/></svg> Bitácora</button>
+      <button class="nav-item" data-v="migracion"><svg class="i" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><path d="M7 10l5 5 5-5M12 15V3"/></svg> Migrar desde Excel</button>
+      <button class="nav-item" data-v="config"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 13.5a1.6 1.6 0 00.3 1.8 2 2 0 11-2.8 2.8 1.6 1.6 0 00-2.8 1.2 2 2 0 11-4 0 1.6 1.6 0 00-2.8-1.2 2 2 0 11-2.8-2.8 1.6 1.6 0 00-1.2-2.8 2 2 0 110-4 1.6 1.6 0 001.2-2.8 2 2 0 112.8-2.8 1.6 1.6 0 002.8-1.2 2 2 0 114 0 1.6 1.6 0 002.8 1.2 2 2 0 112.8 2.8 1.6 1.6 0 001.2 2.8 2 2 0 110 4 1.6 1.6 0 00-1.2 1z"/></svg> Roles y permisos</button>
     </nav>
-    <div class="side-foot">Acceso por usuario y permisos · Respaldo diario</div>
+    <div class="side-foot"><svg class="i" style="width:14px;height:14px" viewBox="0 0 24 24"><path d="M12 2l8 4v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6z"/><path d="M9 12l2 2 4-4"/></svg> Datos cifrados · respaldo diario</div>
   </aside>
-
-  <!-- MAIN -->
-  <div class="main">
+  <div class="main" style="margin-top:31px">
     <div class="topbar">
-      <button class="hamburger" id="menuBtn" onclick="document.querySelector('.side').classList.toggle('open')">☰</button>
-      <h1 id="vtitle">Panel general</h1>
-      <input class="search" placeholder="Buscar cliente, crédito o folio…">
-      <div class="user"><div class="avatar">MG</div> Mayra G.</div>
+      <div style="display:flex;align-items:center"><button class="hamburger" onclick="document.querySelector('.side').classList.toggle('open')"><svg class="i" viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
+      <div><h1 id="vtitle">Panel del director</h1><div class="crumb" id="vcrumb">Resumen de la operación de hoy</div></div></div>
+      <div class="top-r"><div class="bell"><svg class="i" style="width:20px;height:20px" viewBox="0 0 24 24"><path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9z"/><path d="M13.7 21a2 2 0 01-3.4 0"/></svg><span class="dot"></span></div><span class="role-pill">Director General</span><div class="avatar">DG</div></div>
     </div>
     <div class="content">
 
+      <!-- BENEFICIOS -->
+      <section class="view" id="beneficios">
+        <div class="card" style="background:linear-gradient(150deg,var(--sidebar),var(--primary));color:#fff;border:none">
+          <div style="font-family:var(--display);font-size:21px;font-weight:700;letter-spacing:-.02em">Un sistema pensado para su forma de trabajar</div>
+          <div style="font-size:13.5px;color:#cdd7f0;margin-top:8px;max-width:680px;line-height:1.55">No se trata de cambiar cómo opera, sino de ordenar y respaldar lo que ya hace. El sistema se adapta a sus plazos, sus asesores y su manera de cobrar, no al revés.</div>
+        </div>
+
+        <div class="card" style="margin-top:16px">
+          <div style="font-size:13.5px;color:var(--ink);line-height:1.6">Excel es una buena herramienta para empezar. Pero cuando crecen los clientes, los créditos, los pagos, la mora, la caja y entran varias personas a capturar, aumenta el riesgo de pequeños descuadres: una fórmula que alguien movió sin querer, un saldo que no cuadra, o no saber con certeza quién cambió qué. El sistema mantiene todo eso bajo control, en un solo lugar y siempre actualizado.</div>
+        </div>
+
+        <div class="sec-title">Lo que le da control</div>
+        <div class="grid g3">
+          <div class="card" style="display:flex;align-items:center;gap:11px"><div class="kpi"><div class="ico"><svg class="i" viewBox="0 0 24 24"><rect x="2.5" y="6" width="19" height="13" rx="2.5"/><path d="M2.5 10h19"/></svg></div></div><div style="font-size:13.5px;font-weight:500">Control de caja</div></div>
+          <div class="card" style="display:flex;align-items:center;gap:11px"><div class="kpi"><div class="ico"><svg class="i" viewBox="0 0 24 24"><path d="M3 7h18v12H3z"/><path d="M3 11h18"/></svg></div></div><div style="font-size:13.5px;font-weight:500">Control de cartera</div></div>
+          <div class="card" style="display:flex;align-items:center;gap:11px"><div class="kpi"><div class="ico"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg></div></div><div style="font-size:13.5px;font-weight:500">Vencimientos del día</div></div>
+          <div class="card" style="display:flex;align-items:center;gap:11px"><div class="kpi"><div class="ico g"><svg class="i" viewBox="0 0 24 24"><path d="M3.5 12a8.5 8.5 0 1117 0 8.5 8.5 0 01-17 0z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg></div></div><div style="font-size:13.5px;font-weight:500">Saldos actualizados</div></div>
+          <div class="card" style="display:flex;align-items:center;gap:11px"><div class="kpi"><div class="ico r"><svg class="i" viewBox="0 0 24 24"><path d="M10.3 3.6L2.5 17a2 2 0 001.7 3h15.6a2 2 0 001.7-3L13.7 3.6a2 2 0 00-3.4 0z"/><path d="M12 9v4"/></svg></div></div><div style="font-size:13.5px;font-weight:500">Control de mora</div></div>
+          <div class="card" style="display:flex;align-items:center;gap:11px"><div class="kpi"><div class="ico"><svg class="i" viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></div></div><div style="font-size:13.5px;font-weight:500">Reportes automáticos</div></div>
+          <div class="card" style="display:flex;align-items:center;gap:11px"><div class="kpi"><div class="ico a"><svg class="i" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3.5 19a5.5 5.5 0 0111 0"/></svg></div></div><div style="font-size:13.5px;font-weight:500">Usuarios con permisos</div></div>
+          <div class="card" style="display:flex;align-items:center;gap:11px"><div class="kpi"><div class="ico"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg></div></div><div style="font-size:13.5px;font-weight:500">Bitácora de movimientos</div></div>
+          <div class="card" style="display:flex;align-items:center;gap:11px"><div class="kpi"><div class="ico g"><svg class="i" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5M12 15V3"/><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/></svg></div></div><div style="font-size:13.5px;font-weight:500">Migración desde Excel</div></div>
+        </div>
+
+        <div class="sec-title">Excel hoy vs. sistema a medida</div>
+        <div class="card" style="padding:0;overflow:hidden"><div class="table-wrap"><table>
+          <thead><tr><th>Hoy en Excel</th><th>Con el sistema a medida</th></tr></thead>
+          <tbody>
+            <tr><td style="color:var(--muted)">Fórmulas que se capturan y ajustan a mano</td><td style="font-weight:500">Cálculos controlados según sus 3 planes</td></tr>
+            <tr><td style="color:var(--muted)">El archivo lo puede editar cualquiera</td><td style="font-weight:500">Cada usuario con sus permisos</td></tr>
+            <tr><td style="color:var(--muted)">Difícil saber quién cambió algo</td><td style="font-weight:500">Bitácora con usuario, fecha y monto</td></tr>
+            <tr><td style="color:var(--muted)">Reportes armados manualmente</td><td style="font-weight:500">Reportes automáticos en PDF y Excel</td></tr>
+            <tr><td style="color:var(--muted)">Caja revisada y sumada a mano</td><td style="font-weight:500">Corte de caja diario que cuadra solo</td></tr>
+          </tbody></table></div></div>
+
+        <div class="explain" style="margin-top:18px"><svg class="i" viewBox="0 0 24 24"><path d="M12 2l2.4 5 5.6.8-4 4 1 5.6-5-2.7-5 2.7 1-5.6-4-4 5.6-.8z"/></svg><div>A diferencia de sistemas más grandes pensados para empresas con procesos regulatorios o módulos avanzados, esta propuesta <b>se puede implementar por etapas</b>, enfocándose primero en lo que de verdad necesitan: caja, cartera, pagos, vencimientos y reportes.</div></div>
+      </section>
+
       <!-- PANEL -->
       <section class="view active" id="panel">
+        <div class="explain"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v.01M11 12h1v4h1"/></svg><div><b>El tablero del director.</b> De un vistazo ve caja, cartera, mora y vencimientos del día, sin abrir Excel.<span class="add">Se puede agregar: comparativos por mes y metas por asesor.</span></div></div>
         <div class="grid g4">
-          <div class="card stat"><div class="lbl">Cartera total</div><div class="val">$1,248,500</div><div class="sub">312 créditos activos</div></div>
-          <div class="card stat"><div class="lbl">En mora</div><div class="val bad">$84,300</div><div class="sub">6.7% de la cartera</div></div>
-          <div class="card stat"><div class="lbl">Desembolsado (mes)</div><div class="val">$312,000</div><div class="sub">28 créditos nuevos</div></div>
-          <div class="card stat"><div class="lbl">Cobrado (hoy)</div><div class="val">$41,650</div><div class="sub">37 abonos registrados</div></div>
+          <div class="card kpi"><div class="ico"><svg class="i" viewBox="0 0 24 24"><path d="M3 7h18v12H3z"/><path d="M3 11h18"/></svg></div><div class="lbl">Cartera total</div><div class="val">$1,412,325</div><div class="trend up">▲ crecimiento 1%</div></div>
+          <div class="card kpi"><div class="ico g"><svg class="i" viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></div><div class="lbl">Cobrado hoy</div><div class="val good">$41,650</div><div class="trend up">37 pagos</div></div>
+          <div class="card kpi"><div class="ico a"><svg class="i" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></div><div class="lbl">Desembolsado hoy</div><div class="val">$18,000</div><div class="trend n">2 créditos</div></div>
+          <div class="card kpi"><div class="ico"><svg class="i" viewBox="0 0 24 24"><rect x="2.5" y="6" width="19" height="13" rx="2.5"/><path d="M2.5 10h19"/></svg></div><div class="lbl">Caja del día</div><div class="val good">$58,300</div><div class="trend up">cuadrada</div></div>
         </div>
-
-        <div class="sec-title">Pagos programados para hoy</div>
-        <div class="card" style="padding:0;overflow:hidden">
-          <table>
-            <thead><tr><th>Cliente</th><th>Crédito</th><th>Frecuencia</th><th>Monto</th><th>Estado</th></tr></thead>
-            <tbody>
-              <tr><td><div class="cli"><div class="ci">JR</div> Juan Ramírez</div></td><td>#1042</td><td>Semanal</td><td>$850</td><td><span class="badge b-ok">Al corriente</span></td></tr>
-              <tr><td><div class="cli"><div class="ci">MG</div> María González</div></td><td>#0987</td><td>Quincenal</td><td>$1,200</td><td><span class="badge b-warn">Vence hoy</span></td></tr>
-              <tr><td><div class="cli"><div class="ci">PL</div> Pedro López</div></td><td>#1110</td><td>Semanal</td><td>$1,500 + mora</td><td><span class="badge b-bad">6 días atraso</span></td></tr>
-              <tr><td><div class="cli"><div class="ci">AS</div> Ana Soto</div></td><td>#1201</td><td>Mensual</td><td>$3,400</td><td><span class="badge b-ok">Al corriente</span></td></tr>
-            </tbody>
-          </table>
+        <div class="grid g4" style="margin-top:16px">
+          <div class="card kpi"><div class="ico r"><svg class="i" viewBox="0 0 24 24"><path d="M10.3 3.6L2.5 17a2 2 0 001.7 3h15.6a2 2 0 001.7-3L13.7 3.6a2 2 0 00-3.4 0z"/><path d="M12 9v4"/></svg></div><div class="lbl">Mora total</div><div class="val bad">$77,500</div><div class="trend down">9.2% cartera</div></div>
+          <div class="card kpi"><div class="ico a"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18"/></svg></div><div class="lbl">Vencimientos del día</div><div class="val">$31,200</div><div class="trend n">23 pagos</div></div>
+          <div class="card kpi"><div class="ico g"><svg class="i" viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V8z"/><path d="M14 3v5h5"/></svg></div><div class="lbl">Créditos nuevos del mes</div><div class="val">47</div><div class="trend up">meta 50</div></div>
+          <div class="card kpi"><div class="ico r"><svg class="i" viewBox="0 0 24 24"><path d="M12 9v4M12 16.5v.5"/><circle cx="12" cy="12" r="9"/></svg></div><div class="lbl">Créditos vencidos</div><div class="val bad">14</div><div class="trend down">revisar</div></div>
         </div>
-      </section>
-
-      <!-- CLIENTES -->
-      <section class="view" id="clientes">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-          <input class="search" placeholder="Buscar por nombre, teléfono o folio…" style="width:320px">
-          <button class="btn" onclick="go('nuevo')">＋ Nuevo cliente</button>
-        </div>
-        <div class="card" style="padding:0;overflow:hidden">
-          <table>
-            <thead><tr><th>Cliente</th><th>Teléfono</th><th>Créditos</th><th>Saldo</th><th>Cobrador</th><th>Estado</th></tr></thead>
-            <tbody>
-              <tr><td><div class="cli"><div class="ci">JR</div> Juan Ramírez</div></td><td>656 123 4567</td><td>1 activo</td><td>$12,400</td><td>Carlos V.</td><td><span class="badge b-ok">Al corriente</span></td></tr>
-              <tr><td><div class="cli"><div class="ci">MG</div> María González</div></td><td>656 222 8890</td><td>2 activos</td><td>$28,900</td><td>Carlos V.</td><td><span class="badge b-warn">Por vencer</span></td></tr>
-              <tr><td><div class="cli"><div class="ci">PL</div> Pedro López</div></td><td>656 445 1120</td><td>1 activo</td><td>$9,800</td><td>Diana R.</td><td><span class="badge b-bad">En mora</span></td></tr>
-              <tr><td><div class="cli"><div class="ci">AS</div> Ana Soto</div></td><td>656 778 2031</td><td>1 activo</td><td>$41,000</td><td>Diana R.</td><td><span class="badge b-ok">Al corriente</span></td></tr>
-              <tr><td><div class="cli"><div class="ci">RT</div> Roberto Tena</div></td><td>656 901 5567</td><td>3 activos</td><td>$67,200</td><td>Carlos V.</td><td><span class="badge b-ok">Al corriente</span></td></tr>
-            </tbody>
-          </table>
-        </div>
-        <div class="note">Cada cobrador solo ve los clientes que tiene asignados. El administrador ve toda la cartera.</div>
-      </section>
-
-      <!-- NUEVO CREDITO -->
-      <section class="view" id="nuevo">
-        <div class="grid g2" style="grid-template-columns:1fr 1fr;align-items:start">
+        <div class="grid g2" style="margin-top:16px;grid-template-columns:1.6fr 1fr">
           <div class="card">
-            <div class="sec-title" style="margin-top:0">Datos del crédito</div>
-            <div class="form-row"><label>Cliente</label><select><option>Juan Ramírez</option><option>María González</option><option>+ Registrar nuevo cliente…</option></select></div>
-            <div class="form-row"><label>Monto a prestar (capital)</label><input type="number" id="cMonto" value="10000" oninput="calc()"></div>
-            <div class="grid g2">
-              <div class="form-row"><label>Plazo (número de pagos)</label><input type="number" id="cPlazo" value="12" oninput="calc()"></div>
-              <div class="form-row"><label>Frecuencia</label><select id="cFreq" onchange="calc()"><option value="Semanal">Semanal</option><option value="Quincenal">Quincenal</option><option value="Mensual" selected>Mensual</option></select></div>
-            </div>
-            <div class="grid g2">
-              <div class="form-row"><label>Tasa de interés (% por periodo)</label><input type="number" id="cTasa" value="8" oninput="calc()"></div>
-              <div class="form-row"><label>Fecha de inicio</label><input type="date" value="2026-05-30"></div>
-            </div>
-            <button class="btn" style="width:100%">Generar crédito y calendario de pagos</button>
+            <div class="panel-head"><div><div style="font-family:var(--display);font-weight:600;font-size:15px">Comportamiento de cartera</div><div style="font-size:12px;color:var(--faint)">Últimas 5 semanas</div></div><span class="badge b-ok">Recuperación 94%</span></div>
+            <svg viewBox="0 0 520 180" style="width:100%;height:auto">
+              <defs><linearGradient id="ar" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2c4a8f" stop-opacity=".28"/><stop offset="1" stop-color="#2c4a8f" stop-opacity="0"/></linearGradient></defs>
+              <line x1="40" y1="150" x2="510" y2="150" stroke="#eef1f6"/><line x1="40" y1="60" x2="510" y2="60" stroke="#f3f5f9"/><line x1="40" y1="105" x2="510" y2="105" stroke="#f3f5f9"/>
+              <path d="M40 70 L157 78 L274 112 L391 66 L510 84 L510 150 L40 150 Z" fill="url(#ar)"/>
+              <path d="M40 70 L157 78 L274 112 L391 66 L510 84" fill="none" stroke="#2c4a8f" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="510" cy="84" r="4" fill="#2c4a8f"/>
+              <g font-family="IBM Plex Sans" font-size="10" fill="#9aa4b6"><text x="40" y="166">S-4</text><text x="157" y="166">S-3</text><text x="274" y="166">S-2</text><text x="391" y="166">S-1</text><text x="505" y="166">Hoy</text></g>
+            </svg>
           </div>
           <div class="card">
-            <div class="sec-title" style="margin-top:0">Resumen calculado</div>
+            <div style="font-family:var(--display);font-weight:600;font-size:15px">Cartera por asesor</div>
+            <div style="margin-top:16px">
+              <div class="bar-row"><span class="nm">Valentín</span><div class="bar-track"><div class="bar-fill" style="width:100%"></div></div><span class="amt">$284,712</span></div>
+              <div class="bar-row"><span class="nm">Asesor 2</span><div class="bar-track"><div class="bar-fill" style="width:78%"></div></div><span class="amt">$221,000</span></div>
+              <div class="bar-row"><span class="nm">Asesor 3</span><div class="bar-track"><div class="bar-fill" style="width:69%"></div></div><span class="amt">$196,500</span></div>
+              <div class="bar-row" style="margin-bottom:0"><span class="nm">Asesor 4</span><div class="bar-track"><div class="bar-fill" style="width:62%"></div></div><span class="amt">$177,000</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="note">Panel pensado para el <b>director</b>: de un vistazo ve caja, cartera, mora y vencimientos, sin abrir un solo Excel.</div>
+      </section>
+
+      <!-- CAJA -->
+      <section class="view" id="caja">
+        <div class="explain"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v.01M11 12h1v4h1"/></svg><div><b>Cuadre automático de caja.</b> Suma ingresos, egresos y gastos del día y marca si la caja cuadra o hay diferencia. Resuelve su dolor principal.<span class="add">Se puede agregar: corte por turno y por usuario.</span></div></div>
+        <div class="panel-head"><div class="seg"><button class="on">Hoy</button><button>Ayer</button><button>Esta semana</button></div>
+          <div style="display:flex;gap:8px"><button class="btn btn-ghost btn-sm">Exportar Excel</button><button class="btn btn-ghost btn-sm">Imprimir corte</button><button class="btn btn-sm">Cerrar caja</button></div></div>
+        <div class="grid g4">
+          <div class="card kpi"><div class="lbl">Caja inicial</div><div class="val">$36,000</div></div>
+          <div class="card kpi"><div class="lbl">Ingresos por pagos</div><div class="val good">+ $41,650</div></div>
+          <div class="card kpi"><div class="lbl">Egresos por desembolsos</div><div class="val bad">− $18,000</div></div>
+          <div class="card kpi"><div class="lbl">Gastos operativos</div><div class="val bad">− $1,350</div></div>
+        </div>
+        <div class="grid g2" style="margin-top:16px;align-items:start">
+          <div class="card">
+            <div class="sec-title" style="margin-top:0">Registrar movimiento</div>
+            <div class="form-row"><label>Tipo</label><select><option>Ingreso: pago de crédito</option><option>Egreso: desembolso</option><option>Egreso: gasto operativo</option></select></div>
+            <div class="grid g2"><div class="form-row" style="margin-bottom:0"><label>Concepto</label><input placeholder="Ej. gasolina, renta…"></div><div class="form-row" style="margin-bottom:0"><label>Monto</label><input type="number" placeholder="0.00"></div></div>
+            <button class="btn" style="width:100%;justify-content:center;margin-top:15px">Registrar en caja</button>
+          </div>
+          <div class="cuadre">
+            <div class="lbl">CORTE DE CAJA · HOY</div><div class="big">$58,300</div>
+            <div style="margin-top:14px;border-top:1px solid rgba(255,255,255,.18);padding-top:11px">
+              <div class="row"><span>Caja esperada (sistema)</span><b>$58,300</b></div>
+              <div class="row"><span>Caja contada (físico)</span><b>$58,300</b></div>
+              <div class="row"><span>Diferencia</span><b>$0</b></div>
+            </div>
+            <div class="ok"><svg class="i" style="width:14px;height:14px" viewBox="0 0 24 24"><path d="M5 12l5 5 9-11"/></svg> Caja cuadrada</div>
+          </div>
+        </div>
+        <div class="grid g3" style="margin-top:8px">
+          <div class="card" style="padding:0;overflow:hidden"><div style="padding:14px 16px;font-weight:600;font-size:13.5px;font-family:var(--display)">Pagos del día</div><div class="table-wrap"><table><tbody>
+            <tr><td>J. Ramírez · #1042</td><td style="text-align:right" class="pos">+ $850</td></tr>
+            <tr><td>M. González · #0987</td><td style="text-align:right" class="pos">+ $1,200</td></tr>
+            <tr><td>Y. Cruz · #0096</td><td style="text-align:right" class="pos">+ $1,500</td></tr></tbody></table></div></div>
+          <div class="card" style="padding:0;overflow:hidden"><div style="padding:14px 16px;font-weight:600;font-size:13.5px;font-family:var(--display)">Desembolsos del día</div><div class="table-wrap"><table><tbody>
+            <tr><td>A. Pérez · #1215</td><td style="text-align:right" class="neg">− $8,000</td></tr>
+            <tr><td>L. Díaz · #1216</td><td style="text-align:right" class="neg">− $10,000</td></tr></tbody></table></div></div>
+          <div class="card" style="padding:0;overflow:hidden"><div style="padding:14px 16px;font-weight:600;font-size:13.5px;font-family:var(--display)">Gastos del día</div><div class="table-wrap"><table><tbody>
+            <tr><td>Gasolina</td><td style="text-align:right" class="neg">− $350</td></tr>
+            <tr><td>Papelería</td><td style="text-align:right" class="neg">− $1,000</td></tr></tbody></table></div></div>
+        </div>
+        <div class="note">Resuelve el dolor principal: <b>cuadrar ingresos, egresos y caja</b> automáticamente. El sistema compara la caja esperada contra la contada y marca si cuadra o hay diferencia por revisar.</div>
+      </section>
+
+      <!-- VENCIMIENTOS -->
+      <section class="view" id="venc">
+        <div class="explain"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v.01M11 12h1v4h1"/></svg><div><b>Qué se cobra hoy.</b> Muestra los pagos del día, la semana y lo vencido, con saldo y mora. Así no se le pasa ningún cobro.<span class="add">Se puede agregar: vista por asesor y por día de pago.</span></div></div>
+        <div class="panel-head"><div class="seg"><button class="on">Hoy</button><button>Esta semana</button><button>Vencidos</button><button>Pagados</button></div><button class="btn btn-ghost btn-sm">Exportar Excel</button></div>
+        <div class="card" style="padding:0;overflow:hidden"><div class="table-wrap"><table>
+          <thead><tr><th>Cliente</th><th>Monto</th><th>Frecuencia</th><th>Vence</th><th>Mora fija</th><th>Saldo restante</th><th>Estatus</th></tr></thead>
+          <tbody>
+            <tr><td>Juan Ramírez</td><td>$1,200</td><td>Semanal</td><td>Hoy</td><td>$0</td><td>$3,600</td><td><span class="badge b-ok">Pagado</span></td></tr>
+            <tr><td>María González</td><td>$900</td><td>Catorcenal</td><td>Hoy</td><td>$0</td><td>$6,300</td><td><span class="badge b-warn">Pendiente</span></td></tr>
+            <tr><td>Roberto Tena</td><td>$2,100</td><td>Semanal</td><td>Hoy</td><td>$0</td><td>$8,400</td><td><span class="badge b-warn">Pendiente</span></td></tr>
+            <tr><td>Pedro López</td><td>$1,500</td><td>Semanal</td><td>Hace 1 sem</td><td>$100</td><td>$4,500</td><td><span class="badge b-bad">Vencido</span></td></tr>
+            <tr><td>Elena Mora</td><td>$1,600</td><td>Catorcenal</td><td>Hace 2 sem</td><td>$200</td><td>$6,400</td><td><span class="badge b-bad">Vencido</span></td></tr>
+          </tbody></table></div></div>
+        <div class="note">Filtros rápidos por <b>hoy, semana, vencidos y pagados</b>. La mora fija se aplica sola al pasar la fecha.</div>
+      </section>
+
+      <!-- CARTERA -->
+      <section class="view" id="cartera">
+        <div class="explain"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v.01M11 12h1v4h1"/></svg><div><b>El estado real de su dinero.</b> Todos los créditos activos con capital, interés, pagado, saldo y estado en una sola vista.<span class="add">Se puede agregar: filtros por monto, antigüedad y asesor.</span></div></div>
+        <div class="panel-head"><input placeholder="Buscar cliente o folio…" style="max-width:300px"><div class="seg"><button class="on">Todos</button><button>Al corriente</button><button>En mora</button></div></div>
+        <div class="card" style="padding:0;overflow:hidden"><div class="table-wrap"><table>
+          <thead><tr><th>Cliente</th><th>Capital</th><th>Interés fijo</th><th>Total</th><th>Pagado</th><th>Saldo</th><th>Mora</th><th>Próx. vence</th><th>Aval</th><th>Estado</th></tr></thead>
+          <tbody>
+            <tr><td>Nereyda Betanzos</td><td>$8,000</td><td>$2,800</td><td>$10,800</td><td>$10,800</td><td>$0</td><td>$0</td><td>Ninguno</td><td>Sí</td><td><span class="badge b-ok">Liquidado</span></td></tr>
+            <tr><td>Elizabeth López</td><td>$20,000</td><td>$7,000</td><td>$27,000</td><td>$10,800</td><td>$16,200</td><td>$0</td><td>Lun</td><td>Sí</td><td><span class="badge b-ok">Al corriente</span></td></tr>
+            <tr><td>Manuel Adín</td><td>$25,000</td><td>$8,750</td><td>$33,750</td><td>$13,500</td><td>$20,250</td><td>$0</td><td>Jue</td><td>Sí</td><td><span class="badge b-ok">Al corriente</span></td></tr>
+            <tr><td>Pedro López</td><td>$5,000</td><td>$1,750</td><td>$6,750</td><td>$2,250</td><td>$4,500</td><td>$100</td><td>Vencido</td><td>No</td><td><span class="badge b-bad">En mora</span></td></tr>
+            <tr><td>Mainor Mondragón</td><td>$7,000</td><td>$4,900</td><td>$11,900</td><td>$1,487</td><td>$10,412</td><td>$200</td><td>Vencido</td><td>Sí</td><td><span class="badge b-bad">En mora</span></td></tr>
+          </tbody></table></div></div>
+        <div class="note">Interés <b>fijo según el plan</b> (35% a 9 sem o 5 cat; 70% a 8 cat), igual que en su Excel actual.</div>
+      </section>
+
+      <!-- CLIENTES (expediente) -->
+      <section class="view" id="clientes">
+        <div class="explain"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v.01M11 12h1v4h1"/></svg><div><b>Expediente completo del cliente.</b> Datos, INE, CURP, aval, crédito activo, historial y notas, todo en una pantalla.<span class="add">Se puede agregar: guardar foto del INE y comprobante.</span></div></div>
+        <div class="panel-head"><input placeholder="Buscar cliente…" style="max-width:300px"><button class="btn" onclick="go('nuevo')"><svg class="i" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg> Nuevo cliente</button></div>
+        <div class="grid g2" style="align-items:start">
+          <div class="card">
+            <div style="display:flex;align-items:center;gap:14px"><div class="ci" style="width:54px;height:54px;font-size:18px">NB</div><div><div style="font-family:var(--display);font-weight:600;font-size:17px">Nereyda Betanzos Ramos</div><div style="font-size:12.5px;color:var(--muted)">Cliente desde sep 2025 · Asesor: Valentín</div></div></div>
+            <div class="grid g2" style="margin-top:18px;gap:11px">
+              <div><div style="font-size:11px;color:var(--faint);text-transform:uppercase">Teléfono</div><div style="font-size:13.5px">968 123 4567</div></div>
+              <div><div style="font-size:11px;color:var(--faint);text-transform:uppercase">Dirección</div><div style="font-size:13.5px">Col. Centro, Cintalapa</div></div>
+              <div><div style="font-size:11px;color:var(--faint);text-transform:uppercase">INE</div><div style="font-size:13.5px">Registrada ✓</div></div>
+              <div><div style="font-size:11px;color:var(--faint);text-transform:uppercase">CURP</div><div style="font-size:13.5px">Registrada ✓</div></div>
+              <div><div style="font-size:11px;color:var(--faint);text-transform:uppercase">Referencias</div><div style="font-size:13.5px">2 registradas</div></div>
+              <div><div style="font-size:11px;color:var(--faint);text-transform:uppercase">Aval</div><div style="font-size:13.5px">José Ramos (sí)</div></div>
+            </div>
+            <div class="form-row" style="margin-top:16px;margin-bottom:0"><label>Notas internas</label><input value="Buen historial, ya va en ciclo 2"></div>
+          </div>
+          <div class="card">
+            <div class="sec-title" style="margin-top:0">Historial de pagos</div>
+            <div class="table-wrap"><table><thead><tr><th>Fecha</th><th>Crédito</th><th>Monto</th><th>Estado</th></tr></thead><tbody>
+              <tr><td>05 may</td><td>#0025 (ciclo 2)</td><td>$1,350</td><td><span class="badge b-ok">Pagado</span></td></tr>
+              <tr><td>28 abr</td><td>#0025 (ciclo 2)</td><td>$1,350</td><td><span class="badge b-ok">Pagado</span></td></tr>
+              <tr><td>21 abr</td><td>#0025 (ciclo 2)</td><td>$1,350</td><td><span class="badge b-ok">Pagado</span></td></tr>
+              <tr><td>Anterior</td><td>#0001 (ciclo 1)</td><td>Liquidado</td><td><span class="badge b-n">Cerrado</span></td></tr>
+            </tbody></table></div>
+            <div class="note" style="margin-bottom:0">Expediente simple con todo en una pantalla: datos, aval, crédito activo, historial y notas.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- NUEVO -->
+      <section class="view" id="nuevo">
+        <div class="explain"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v.01M11 12h1v4h1"/></svg><div><b>Alta con sus planes reales.</b> Usa sus 3 planes (35% y 70%) y genera el calendario de pagos con fechas. Calcula idéntico a su Excel.<span class="add">Se puede agregar: contrato y pagaré en PDF automáticos.</span></div></div>
+        <div class="grid g2" style="align-items:start">
+          <div class="card">
+            <div class="sec-title" style="margin-top:0">Nuevo crédito individual</div>
+            <div class="grid g2"><div class="form-row"><label>Cliente</label><select><option>Juan Ramírez</option><option>+ Registrar nuevo…</option></select></div><div class="form-row"><label>Asesor</label><select><option>Valentín</option><option>Asesor 2</option><option>Asesor 3</option><option>Asesor 4</option></select></div></div>
+            <div class="form-row"><label>Monto a prestar (capital)</label><input type="number" id="cMonto" value="8000" oninput="calc()"></div>
+            <div class="form-row"><label>Plan de pago</label><select id="cPlan" onchange="calc()">
+              <option value="9-35-Semanal">9 pagos semanales · interés 35%</option>
+              <option value="5-35-Catorcenal">5 pagos catorcenales · interés 35%</option>
+              <option value="8-70-Catorcenal">8 pagos catorcenales · interés 70%</option>
+            </select></div>
+            <div style="margin-bottom:15px"><span class="chip">+ Agregar aval</span><span class="chip">+ Garantía</span><span class="chip">+ Generar contrato y pagaré</span></div>
+            <button class="btn" style="width:100%;justify-content:center">Generar crédito y calendario</button>
+          </div>
+          <div class="card">
+            <div class="sec-title" style="margin-top:0">Resumen y calendario</div>
             <div class="calc-out">
-              <div style="font-size:12px;color:var(--primary-dark);font-weight:600">PAGO POR PERIODO</div>
-              <div class="big" id="oPago">$933</div>
-              <div style="margin-top:12px;border-top:1px solid rgba(15,110,86,.2);padding-top:10px">
-                <div class="calc-line"><span>Capital prestado</span><b id="oCap">$10,000</b></div>
-                <div class="calc-line"><span>Intereses totales</span><b id="oInt">$1,200</b></div>
-                <div class="calc-line"><span>Total a pagar</span><b id="oTot">$11,200</b></div>
-                <div class="calc-line"><span>Número de pagos</span><b id="oNum">12 mensuales</b></div>
+              <div style="font-size:12px;color:var(--primary);font-weight:600">PAGO POR PERIODO</div><div class="big" id="oPago">$1,200</div>
+              <div style="margin-top:14px;border-top:1px solid rgba(34,55,107,.14);padding-top:11px">
+                <div class="calc-line"><span>Capital prestado</span><b id="oCap">$8,000</b></div>
+                <div class="calc-line"><span>Interés fijo</span><b id="oInt">$2,800</b></div>
+                <div class="calc-line"><span>Total a pagar</span><b id="oTot">$10,800</b></div>
+                <div class="calc-line"><span>Número de pagos</span><b id="oNum">9 semanales</b></div>
               </div>
             </div>
-            <div class="note">El sistema genera el calendario completo y calcula la <b>mora automáticamente</b> cuando un pago se atrasa, según la regla que configures.</div>
+            <div class="sec-title">Calendario generado</div>
+            <div class="table-wrap" style="max-height:180px;overflow-y:auto"><table id="calTbl"><thead><tr><th>#</th><th>Fecha</th><th>Pago</th><th>Saldo</th></tr></thead><tbody></tbody></table></div>
           </div>
         </div>
       </section>
 
-      <!-- COBRANZA -->
-      <section class="view" id="cobranza">
-        <div class="grid g3">
-          <div class="card stat"><div class="lbl">Por cobrar hoy</div><div class="val">$58,300</div></div>
-          <div class="card stat"><div class="lbl">Cobrado hoy</div><div class="val">$41,650</div></div>
-          <div class="card stat"><div class="lbl">Pendiente</div><div class="val bad">$16,650</div></div>
-        </div>
-        <div class="sec-title">Registrar abono rápido</div>
-        <div class="card">
-          <div class="grid g3" style="align-items:end">
-            <div class="form-row" style="margin:0"><label>Cliente / crédito</label><select><option>Juan Ramírez · #1042</option><option>María González · #0987</option></select></div>
-            <div class="form-row" style="margin:0"><label>Monto del abono</label><input type="number" value="850"></div>
-            <button class="btn">Registrar pago</button>
+      <!-- PAGOS -->
+      <section class="view" id="pagos">
+        <div class="explain"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v.01M11 12h1v4h1"/></svg><div><b>Cobranza rápida y clara.</b> Pago normal, abono parcial o liquidación; actualiza el saldo al instante y genera recibo.<span class="add">Se puede agregar: envío del recibo por correo.</span></div></div>
+        <div class="grid g2" style="align-items:start">
+          <div class="card">
+            <div class="sec-title" style="margin-top:0">Registrar pago</div>
+            <div class="form-row"><label>Cliente / crédito</label><select><option>Juan Ramírez · #1042 · saldo $3,600</option><option>Pedro López · #1110 · saldo $4,500</option></select></div>
+            <div class="form-row"><label>Tipo de pago</label><div class="seg" style="width:100%"><button class="on">Normal</button><button>Abono parcial</button><button>Liquidación anticipada</button><button>Con mora</button></div></div>
+            <div class="grid g2"><div class="form-row"><label>Monto</label><input type="number" value="1200"></div><div class="form-row"><label>Mora aplicada</label><input type="number" value="0"></div></div>
+            <div style="display:flex;gap:8px"><button class="btn" style="flex:1;justify-content:center">Registrar pago</button><button class="btn btn-gold">Recibo PDF</button></div>
           </div>
-          <div class="note" style="margin-bottom:0">Genera recibo en PDF con tu logo, listo para enviar por WhatsApp. Actualiza el saldo al instante.</div>
+          <div class="card">
+            <div class="sec-title" style="margin-top:0">Saldo del crédito</div>
+            <div class="calc-out">
+              <div style="font-size:12px;color:var(--primary);font-weight:600">SALDO ACTUAL</div><div class="big">$3,600</div>
+              <div style="margin-top:14px;border-top:1px solid rgba(34,55,107,.14);padding-top:11px">
+                <div class="calc-line"><span>Total del crédito</span><b>$10,800</b></div>
+                <div class="calc-line"><span>Pagado (6 de 9)</span><b>$7,200</b></div>
+                <div class="calc-line"><span>Restante</span><b>$3,600</b></div>
+                <div class="calc-line"><span>Si liquida hoy</span><b style="color:var(--ok)">$3,600</b></div>
+              </div>
+            </div>
+            <div class="note" style="margin-bottom:0">El saldo se actualiza al instante y el pago entra solo a la caja del día.</div>
+          </div>
         </div>
-        <div class="sec-title">Ruta del cobrador · Carlos V.</div>
-        <div class="card" style="padding:0;overflow:hidden">
-          <table>
-            <thead><tr><th>Orden</th><th>Cliente</th><th>Zona</th><th>Monto</th><th>Estado</th></tr></thead>
-            <tbody>
-              <tr><td>1</td><td>Juan Ramírez</td><td>Pronaf</td><td>$850</td><td><span class="badge b-ok">Cobrado</span></td></tr>
-              <tr><td>2</td><td>María González</td><td>Centro</td><td>$1,200</td><td><span class="badge b-warn">Pendiente</span></td></tr>
-              <tr><td>3</td><td>Roberto Tena</td><td>Centro</td><td>$2,100</td><td><span class="badge b-warn">Pendiente</span></td></tr>
-            </tbody>
-          </table>
+      </section>
+
+      <!-- REFI -->
+      <section class="view" id="refi">
+        <div class="explain"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v.01M11 12h1v4h1"/></svg><div><b>Renovaciones ordenadas.</b> Maneja ciclos igual que su Excel, ligando cada renovación al cliente con su historial.<span class="add">Se puede agregar: arrastre automático del saldo anterior.</span></div></div>
+        <div class="grid g2" style="align-items:start">
+          <div class="card">
+            <div class="sec-title" style="margin-top:0">Refinanciar crédito</div>
+            <div class="form-row"><label>Cliente / crédito actual</label><select><option>Armando López · #0056 · saldo $3,400</option></select></div>
+            <div class="grid g2"><div class="form-row"><label>Saldo actual</label><input value="$3,400" readonly></div><div class="form-row"><label>Mora acumulada</label><input value="$0" readonly></div></div>
+            <div class="form-row"><label>Monto refinanciado (nuevo)</label><input type="number" value="8000"></div>
+            <div class="form-row"><label>Nuevo plan</label><select><option>8 pagos catorcenales · 70%</option><option>9 pagos semanales · 35%</option></select></div>
+            <div class="form-row"><label>Motivo</label><input placeholder="Ej. reestructura por buen historial"></div>
+            <button class="btn" style="width:100%;justify-content:center">Generar refinanciamiento (ciclo 3)</button>
+          </div>
+          <div class="card">
+            <div class="sec-title" style="margin-top:0">Historial de refinanciamientos</div>
+            <div class="table-wrap"><table><thead><tr><th>Ciclo</th><th>Fecha</th><th>Monto</th><th>Estado</th></tr></thead><tbody>
+              <tr><td>Ciclo 1</td><td>nov 2025</td><td>$5,000</td><td><span class="badge b-n">Cerrado</span></td></tr>
+              <tr><td>Ciclo 2</td><td>ene 2026</td><td>$7,000</td><td><span class="badge b-n">Cerrado</span></td></tr>
+              <tr><td>Ciclo 3</td><td>mar 2026</td><td>$8,000</td><td><span class="badge b-ok">Activo</span></td></tr>
+            </tbody></table></div>
+            <div class="note" style="margin-bottom:0">Maneja <b>ciclos</b> igual que su Excel: cada renovación queda ligada al cliente con su historial.</div>
+          </div>
         </div>
       </section>
 
       <!-- MORA -->
       <section class="view" id="mora">
+        <div class="explain"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v.01M11 12h1v4h1"/></svg><div><b>Control de lo vencido.</b> Concentra la cartera en mora con su penalización fija para que pueda actuar a tiempo.<span class="add">Se puede agregar: reporte de recuperación por asesor.</span></div></div>
         <div class="grid g3">
-          <div class="card stat"><div class="lbl">Total en mora</div><div class="val bad">$84,300</div></div>
-          <div class="card stat"><div class="lbl">Clientes morosos</div><div class="val">19</div></div>
-          <div class="card stat"><div class="lbl">Mora promedio</div><div class="val">8 días</div></div>
+          <div class="card kpi"><div class="lbl">Índice de mora</div><div class="val bad">9.2%</div></div>
+          <div class="card kpi"><div class="lbl">Monto en mora</div><div class="val bad">$77,500</div></div>
+          <div class="card kpi"><div class="lbl">Créditos morosos</div><div class="val">14</div></div>
         </div>
         <div class="sec-title">Cartera vencida</div>
-        <div class="card" style="padding:0;overflow:hidden">
-          <table>
-            <thead><tr><th>Cliente</th><th>Crédito</th><th>Días atraso</th><th>Saldo vencido</th><th>Interés moratorio</th><th>Acción</th></tr></thead>
-            <tbody>
-              <tr><td><div class="cli"><div class="ci">PL</div> Pedro López</div></td><td>#1110</td><td><span class="badge b-bad">6 días</span></td><td>$1,500</td><td>$90</td><td><button class="btn btn-ghost" style="padding:6px 12px;font-size:12px">Recordatorio</button></td></tr>
-              <tr><td><div class="cli"><div class="ci">EM</div> Elena Mora</div></td><td>#0876</td><td><span class="badge b-bad">14 días</span></td><td>$3,200</td><td>$268</td><td><button class="btn btn-ghost" style="padding:6px 12px;font-size:12px">Recordatorio</button></td></tr>
-              <tr><td><div class="cli"><div class="ci">JT</div> Jorge Téllez</div></td><td>#0791</td><td><span class="badge b-bad">22 días</span></td><td>$5,600</td><td>$616</td><td><button class="btn btn-ghost" style="padding:6px 12px;font-size:12px">Recordatorio</button></td></tr>
-            </tbody>
-          </table>
-        </div>
-        <div class="note warn">El interés moratorio se calcula solo, día por día, según la tasa que configures. Puedes mandar recordatorios masivos por WhatsApp/SMS.</div>
+        <div class="card" style="padding:0;overflow:hidden"><div class="table-wrap"><table>
+          <thead><tr><th>Cliente</th><th>Crédito</th><th>Atraso</th><th>Saldo vencido</th><th>Mora fija</th><th>Acción</th></tr></thead>
+          <tbody>
+            <tr><td>Pedro López</td><td>#1110</td><td><span class="badge b-bad">1 pago</span></td><td>$1,500</td><td>$100</td><td><button class="btn btn-ghost btn-sm">Ver</button></td></tr>
+            <tr><td>Elena Mora</td><td>#0876</td><td><span class="badge b-bad">2 pagos</span></td><td>$3,200</td><td>$200</td><td><button class="btn btn-ghost btn-sm">Ver</button></td></tr>
+            <tr><td>Jorge Téllez</td><td>#0791</td><td><span class="badge b-bad">3 pagos</span></td><td>$5,600</td><td>$300</td><td><button class="btn btn-ghost btn-sm">Ver</button></td></tr>
+          </tbody></table></div></div>
+        <div class="note warn">Mora por <b>monto fijo</b> por atraso; nunca se capitaliza sobre el capital.</div>
       </section>
 
       <!-- REPORTES -->
       <section class="view" id="reportes">
-        <div class="sec-title" style="margin-top:0">Reportes disponibles</div>
+        <div class="explain"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v.01M11 12h1v4h1"/></svg><div><b>Información lista para decidir.</b> Cartera, caja, mora, vencimientos y más, exportables a PDF y Excel.<span class="add">Se puede agregar: reportes hechos a la medida.</span></div></div>
+        <div class="sec-title" style="margin-top:0">Reportes</div>
         <div class="grid g3">
-          <div class="card"><b>📊 Estado de cartera</b><p style="font-size:13px;color:var(--muted);margin-top:8px">Total prestado, cobrado, por cobrar y en mora, por periodo.</p></div>
-          <div class="card"><b>📉 Reporte de morosidad</b><p style="font-size:13px;color:var(--muted);margin-top:8px">Clientes vencidos, días de atraso y montos moratorios.</p></div>
-          <div class="card"><b>👤 Desempeño por cobrador</b><p style="font-size:13px;color:var(--muted);margin-top:8px">Cuánto cobró cada quien, % de recuperación.</p></div>
-          <div class="card"><b>💸 Desembolsos</b><p style="font-size:13px;color:var(--muted);margin-top:8px">Créditos otorgados por fecha, monto y sucursal.</p></div>
-          <div class="card"><b>📄 Estado de cuenta por cliente</b><p style="font-size:13px;color:var(--muted);margin-top:8px">Historial completo de pagos en PDF con tu logo.</p></div>
-          <div class="card"><b>📈 Flujo de efectivo proyectado</b><p style="font-size:13px;color:var(--muted);margin-top:8px">Cuánto se espera cobrar las próximas semanas.</p></div>
+          <div class="card" style="border-color:var(--primary)"><b>📊 Cartera total</b><p style="font-size:12.5px;color:var(--muted);margin:7px 0 12px">Prestado, recuperado, saldo vivo.</p><div style="display:flex;gap:6px"><button class="btn btn-ghost btn-sm">PDF</button><button class="btn btn-ghost btn-sm">Excel</button></div></div>
+          <div class="card" style="border-color:var(--primary)"><b>💵 Caja diaria</b><p style="font-size:12.5px;color:var(--muted);margin:7px 0 12px">Ingresos, egresos y cuadre.</p><div style="display:flex;gap:6px"><button class="btn btn-ghost btn-sm">PDF</button><button class="btn btn-ghost btn-sm">Excel</button></div></div>
+          <div class="card" style="border-color:var(--primary)"><b>📉 Mora</b><p style="font-size:12.5px;color:var(--muted);margin:7px 0 12px">% y monto en mora.</p><div style="display:flex;gap:6px"><button class="btn btn-ghost btn-sm">PDF</button><button class="btn btn-ghost btn-sm">Excel</button></div></div>
+          <div class="card" style="border-color:var(--primary)"><b>📅 Vencimientos del día</b><p style="font-size:12.5px;color:var(--muted);margin:7px 0 12px">Qué cobrar hoy.</p><div style="display:flex;gap:6px"><button class="btn btn-ghost btn-sm">PDF</button><button class="btn btn-ghost btn-sm">Excel</button></div></div>
+          <div class="card"><b>🆕 Créditos nuevos del mes</b><p style="font-size:12.5px;color:var(--muted);margin:7px 0 12px">Altas por asesor y periodo.</p><div style="display:flex;gap:6px"><button class="btn btn-ghost btn-sm">PDF</button><button class="btn btn-ghost btn-sm">Excel</button></div></div>
+          <div class="card"><b>💰 Pagos recibidos</b><p style="font-size:12.5px;color:var(--muted);margin:7px 0 12px">Cobranza por periodo.</p><div style="display:flex;gap:6px"><button class="btn btn-ghost btn-sm">PDF</button><button class="btn btn-ghost btn-sm">Excel</button></div></div>
+          <div class="card"><b>📤 Desembolsos</b><p style="font-size:12.5px;color:var(--muted);margin:7px 0 12px">Créditos otorgados.</p><div style="display:flex;gap:6px"><button class="btn btn-ghost btn-sm">PDF</button><button class="btn btn-ghost btn-sm">Excel</button></div></div>
         </div>
-        <div class="note">Todos los reportes se exportan a Excel/PDF. Se pueden agregar reportes a la medida del negocio.</div>
       </section>
 
-      <!-- CONFIG -->
+      <!-- BITACORA -->
+      <section class="view" id="bitacora">
+        <div class="explain"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v.01M11 12h1v4h1"/></svg><div><b>Nada se mueve sin dejar rastro.</b> Registra quién hizo qué, cuándo y cuánto. Protege su dinero cuando varias personas operan.<span class="add">Se puede agregar: alertas de movimientos grandes.</span></div></div>
+        <div class="sec-title" style="margin-top:0">Bitácora de acciones</div>
+        <div class="card" style="padding:0;overflow:hidden"><div class="table-wrap"><table>
+          <thead><tr><th>Fecha / hora</th><th>Usuario</th><th>Acción</th><th>Cliente</th><th>Monto</th></tr></thead>
+          <tbody>
+            <tr><td>30/05 13:20</td><td>Gerente</td><td><span class="badge b-bad">Desembolso autorizado</span></td><td>L. Díaz</td><td>$10,000</td></tr>
+            <tr><td>30/05 11:30</td><td>Capturista</td><td><span class="badge b-ok">Pago registrado</span></td><td>M. González</td><td>$1,200</td></tr>
+            <tr><td>30/05 10:05</td><td>Gerente</td><td><span class="badge b-n">Crédito autorizado</span></td><td>A. Pérez</td><td>$8,000</td></tr>
+            <tr><td>29/05 18:00</td><td>Director</td><td><span class="badge b-n">Caja cerrada</span></td><td>General</td><td>$52,100</td></tr>
+            <tr><td>29/05 16:42</td><td>Administrador</td><td><span class="badge b-warn">Refinanciamiento creado</span></td><td>A. López</td><td>$8,000</td></tr>
+          </tbody></table></div></div>
+        <div class="note">Cada movimiento queda registrado: quién, qué, cuándo y cuánto. Indispensable cuando 4 personas mueven dinero.</div>
+      </section>
+
+      <!-- MIGRACION -->
+      <section class="view" id="migracion">
+        <div class="explain"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v.01M11 12h1v4h1"/></svg><div><b>Arranca con sus 160 clientes.</b> Carga su Excel actual sin recapturar nada a mano.<span class="add">Se puede agregar: migración de varios asesores a la vez.</span></div></div>
+        <div class="sec-title" style="margin-top:0">Importar cartera desde Excel</div>
+        <div class="card">
+          <div style="display:flex;align-items:center;gap:14px;margin-bottom:18px"><div class="kpi"><div class="ico g"><svg class="i" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5M12 15V3"/><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/></svg></div></div><div><div style="font-family:var(--display);font-weight:600;font-size:15px">Cargue su Excel actual y el sistema arranca con sus 160 clientes</div><div style="font-size:12.5px;color:var(--muted)">Sin recapturar nada a mano</div></div></div>
+          <div class="steps">
+            <div class="step"><div class="n">1</div><div><b>Importar cartera</b><p>Sube tu archivo de Excel actual.</p></div></div>
+            <div class="step"><div class="n">2</div><div><b>Validar duplicados</b><p>Detecta clientes o créditos repetidos.</p></div></div>
+            <div class="step"><div class="n">3</div><div><b>Revisar saldos iniciales</b><p>Confirma capital, pagos y saldo de cada uno.</p></div></div>
+            <div class="step"><div class="n">4</div><div><b>Confirmar migración</b><p>Listo: la cartera queda cargada.</p></div></div>
+          </div>
+          <button class="btn" style="margin-top:18px"><svg class="i" viewBox="0 0 24 24"><path d="M12 15V3M7 8l5-5 5 5"/><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/></svg> Seleccionar archivo Excel</button>
+        </div>
+      </section>
+
+      <!-- ROLES Y PERMISOS -->
       <section class="view" id="config">
-        <div class="grid g2" style="align-items:start">
-          <div class="card">
-            <div class="sec-title" style="margin-top:0">Identidad del negocio</div>
-            <div class="form-row"><label>Nombre de la financiera</label><input value="Financiera del Norte"></div>
-            <div class="form-row"><label>Logo (aparece en el sistema y en los recibos)</label>
-              <button class="btn btn-ghost" onclick="document.getElementById('logoIn').click()">Subir logo</button></div>
-            <div class="form-row"><label>Color principal</label><input type="color" value="#0f6e56" style="height:44px" onchange="document.documentElement.style.setProperty('--primary',this.value)"></div>
-          </div>
-          <div class="card">
-            <div class="sec-title" style="margin-top:0">Reglas de crédito y mora</div>
-            <div class="form-row"><label>Tasa de interés por defecto (%)</label><input type="number" value="8"></div>
-            <div class="form-row"><label>Tasa moratoria diaria (%)</label><input type="number" value="1"></div>
-            <div class="form-row"><label>Días de gracia antes de mora</label><input type="number" value="1"></div>
-          </div>
-          <div class="card">
-            <div class="sec-title" style="margin-top:0">Usuarios y permisos</div>
-            <table>
-              <thead><tr><th>Usuario</th><th>Rol</th><th>Acceso</th></tr></thead>
-              <tbody>
-                <tr><td>Mayra G.</td><td>Administrador</td><td>Todo</td></tr>
-                <tr><td>Carlos V.</td><td>Cobrador</td><td>Su cartera</td></tr>
-                <tr><td>Diana R.</td><td>Cobrador</td><td>Su cartera</td></tr>
-                <tr><td>Sofía P.</td><td>Capturista</td><td>Altas</td></tr>
-              </tbody>
-            </table>
-          </div>
+        <div class="explain"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v.5M11 12h1v4h1"/></svg><div><b>Gestión de permisos.</b> El director controla qué puede hacer y ver cada quien, y puede delegar esa gestión en el gerente, todo sin tocar código.<span class="add">Se puede agregar: usuarios ilimitados, bloqueo por horario y permisos por asesor.</span></div></div>
+
+        <div class="sec-title" style="margin-top:0">Delegación de control</div>
+        <div class="card">
+          <div class="perm-card"><div><div class="t">El gerente puede otorgar y quitar permisos a otros usuarios</div><div class="d">Puede configurar a capturistas y administradores, no a sí mismo</div></div><button class="tog on" onclick="this.classList.toggle('on')"></button></div>
+          <div class="perm-card"><div><div class="t">El gerente puede hacer todos los cambios operativos</div><div class="d">Editar créditos, cerrar caja, autorizar desembolsos</div></div><button class="tog on" onclick="this.classList.toggle('on')"></button></div>
+          <div class="perm-card"><div><div class="t">El gerente puede entrar a configuración de administrador del sistema</div><div class="d">Reservado solo al director (protege la cuenta maestra)</div></div><button class="tog lock" title="Solo el director"></button></div>
         </div>
+
+        <div class="sec-title">Permisos por acción y rol</div>
+        <div class="card" style="padding:0;overflow:hidden"><div class="table-wrap"><table class="perm-grid">
+          <thead><tr><th style="text-align:left">Acción</th><th>Capturista</th><th>Administrador</th><th>Gerente</th><th>Director</th></tr></thead>
+          <tbody>
+            <tr><td>Registrar cliente</td><td><button class="tog on" onclick="this.classList.toggle('on')"></button></td><td><button class="tog on" onclick="this.classList.toggle('on')"></button></td><td><button class="tog on" onclick="this.classList.toggle('on')"></button></td><td><button class="tog lock"></button></td></tr>
+            <tr><td>Registrar crédito</td><td><button class="tog on" onclick="this.classList.toggle('on')"></button></td><td><button class="tog on" onclick="this.classList.toggle('on')"></button></td><td><button class="tog on" onclick="this.classList.toggle('on')"></button></td><td><button class="tog lock"></button></td></tr>
+            <tr><td>Registrar pago</td><td><button class="tog on" onclick="this.classList.toggle('on')"></button></td><td><button class="tog on" onclick="this.classList.toggle('on')"></button></td><td><button class="tog on" onclick="this.classList.toggle('on')"></button></td><td><button class="tog lock"></button></td></tr>
+            <tr><td>Autorizar desembolso</td><td><button class="tog" onclick="this.classList.toggle('on')"></button></td><td><button class="tog" onclick="this.classList.toggle('on')"></button></td><td><button class="tog on" onclick="this.classList.toggle('on')"></button></td><td><button class="tog lock"></button></td></tr>
+            <tr><td>Editar / cancelar pagos</td><td><button class="tog" onclick="this.classList.toggle('on')"></button></td><td><button class="tog on" onclick="this.classList.toggle('on')"></button></td><td><button class="tog on" onclick="this.classList.toggle('on')"></button></td><td><button class="tog lock"></button></td></tr>
+            <tr><td>Cerrar caja</td><td><button class="tog" onclick="this.classList.toggle('on')"></button></td><td><button class="tog" onclick="this.classList.toggle('on')"></button></td><td><button class="tog on" onclick="this.classList.toggle('on')"></button></td><td><button class="tog lock"></button></td></tr>
+            <tr><td>Ver reportes</td><td><button class="tog" onclick="this.classList.toggle('on')"></button></td><td><button class="tog on" onclick="this.classList.toggle('on')"></button></td><td><button class="tog on" onclick="this.classList.toggle('on')"></button></td><td><button class="tog lock"></button></td></tr>
+          </tbody></table></div></div>
+        <div class="sec-title">Qué puede ver cada rol</div>
+        <div class="card" style="padding:0;overflow:hidden"><div class="table-wrap"><table class="perm-grid">
+          <thead><tr><th style="text-align:left">Información visible</th><th>Capturista</th><th>Administrador</th><th>Gerente</th><th>Director</th></tr></thead>
+          <tbody>
+            <tr><td>Solo su propia cartera / asesor</td><td><button class="tog on" onclick="this.classList.toggle('on')"></button></td><td><button class="tog" onclick="this.classList.toggle('on')"></button></td><td><button class="tog" onclick="this.classList.toggle('on')"></button></td><td><button class="tog"></button></td></tr>
+            <tr><td>Toda la cartera del negocio</td><td><button class="tog" onclick="this.classList.toggle('on')"></button></td><td><button class="tog on" onclick="this.classList.toggle('on')"></button></td><td><button class="tog on" onclick="this.classList.toggle('on')"></button></td><td><button class="tog lock"></button></td></tr>
+            <tr><td>Corte y movimientos de caja</td><td><button class="tog" onclick="this.classList.toggle('on')"></button></td><td><button class="tog" onclick="this.classList.toggle('on')"></button></td><td><button class="tog on" onclick="this.classList.toggle('on')"></button></td><td><button class="tog lock"></button></td></tr>
+            <tr><td>Reportes de mora y vencimientos</td><td><button class="tog" onclick="this.classList.toggle('on')"></button></td><td><button class="tog on" onclick="this.classList.toggle('on')"></button></td><td><button class="tog on" onclick="this.classList.toggle('on')"></button></td><td><button class="tog lock"></button></td></tr>
+            <tr><td>Reporte de utilidad del negocio</td><td><button class="tog" onclick="this.classList.toggle('on')"></button></td><td><button class="tog" onclick="this.classList.toggle('on')"></button></td><td><button class="tog on" onclick="this.classList.toggle('on')"></button></td><td><button class="tog lock"></button></td></tr>
+            <tr><td>Bitácora de todos los usuarios</td><td><button class="tog" onclick="this.classList.toggle('on')"></button></td><td><button class="tog" onclick="this.classList.toggle('on')"></button></td><td><button class="tog on" onclick="this.classList.toggle('on')"></button></td><td><button class="tog lock"></button></td></tr>
+          </tbody></table></div></div>
+        <div class="note">Esto controla <b>qué información ve cada quien</b>. Por ejemplo, un asesor solo ve su cartera, nunca la de los demás, aunque conozca el enlace, el sistema no le entrega lo que no le toca.</div>
       </section>
 
-      <!-- PRECIOS -->
-      <section class="view" id="precios">
-        <p style="font-size:14px;color:var(--muted);margin-bottom:18px;max-width:680px">Mismo sistema, dos formas de adquirirlo. El costo del servidor (~$500 MXN/mes) corre por cuenta de la financiera y va a su nombre.</p>
-        <div class="price-grid">
-          <div class="plan">
-            <div class="tag">Opción A · Eres dueño</div>
-            <h3>Pago único + mantenimiento</h3>
-            <div class="price">$55,000 <small>MXN una sola vez</small></div>
-            <ul>
-              <li>Sistema completo a tu nombre</li>
-              <li>50% anticipo, 50% contra entrega</li>
-              <li>Entrega en 6–9 semanas</li>
-              <li>Capacitación incluida</li>
-              <li>Mantenimiento: $2,000 MXN/mes (opcional)</li>
-            </ul>
-            <div class="who">Ideal si quieren ser dueños del sistema y tienen el capital.</div>
-          </div>
-          <div class="plan feat">
-            <div class="tag">Opción B · Sin inversión fuerte</div>
-            <h3>Renta mensual (todo incluido)</h3>
-            <div class="price">$4,000 <small>MXN / mes</small></div>
-            <ul>
-              <li>Arranque único: $8,000 MXN</li>
-              <li>Servidor y respaldos incluidos</li>
-              <li>Soporte y actualizaciones incluidas</li>
-              <li>Sin gran desembolso inicial</li>
-              <li>Permanencia sugerida: 12 meses</li>
-            </ul>
-            <div class="who">Ideal para arrancar ya, pagando poco al inicio.</div>
-          </div>
-        </div>
-        <div class="note">Recomendación de venta: mostrar primero el sistema (las pestañas anteriores) y dejar esta de precios al final.</div>
-      </section>
-
+      <div class="disc">Sistema demo con datos de ejemplo. Herramienta administrativa para control interno de cartera, pagos y caja. No sustituye asesoría legal, fiscal, contable ni regulatoria.</div>
     </div>
   </div>
 </div>
-
 <script>
-  const titles={panel:'Panel general',clientes:'Clientes',nuevo:'Nuevo crédito',cobranza:'Cobranza',mora:'Cartera en mora',reportes:'Reportes',config:'Configuración',precios:'Planes y precios'};
-  function go(v){
-    document.querySelectorAll('.view').forEach(s=>s.classList.toggle('active',s.id===v));
-    document.querySelectorAll('.nav-item').forEach(b=>b.classList.toggle('active',b.dataset.v===v));
-    document.getElementById('vtitle').textContent=titles[v]||'';
-    window.scrollTo({top:0,behavior:'smooth'});
-    document.querySelector('.side').classList.remove('open');
-  }
+  const meta={beneficios:['¿Por qué un sistema a medida?','El valor de ordenar su operación'],panel:['Panel del director','Resumen de la operación de hoy'],caja:['Corte de caja','Cuadre de ingresos, egresos y caja'],venc:['Vencimientos del día','Qué se cobra hoy'],cartera:['Cartera','Todos los créditos activos'],clientes:['Clientes','Expediente del cliente'],nuevo:['Nuevo crédito','Alta y calendario de pagos'],pagos:['Pagos','Cobros, abonos y liquidaciones'],refi:['Refinanciamiento','Renovaciones y ciclos'],mora:['Mora','Cartera vencida'],reportes:['Reportes','Cartera, caja, mora y más'],bitacora:['Bitácora','Historial de acciones'],migracion:['Migrar desde Excel','Carga inicial de la cartera'],config:['Roles y permisos','Quién puede hacer qué']};
+  function enter(){document.getElementById('login').style.display='none';document.getElementById('app').classList.add('show');}
+  function go(v){document.querySelectorAll('.view').forEach(s=>s.classList.remove('active'));const el=document.getElementById(v);void el.offsetWidth;el.classList.add('active');document.querySelectorAll('.nav-item').forEach(b=>b.classList.toggle('active',b.dataset.v===v));document.getElementById('vtitle').textContent=meta[v][0];document.getElementById('vcrumb').textContent=meta[v][1];window.scrollTo({top:0,behavior:'smooth'});document.querySelector('.side').classList.remove('open');}
   document.getElementById('nav').addEventListener('click',e=>{const b=e.target.closest('.nav-item');if(b)go(b.dataset.v);});
-  function loadLogo(e){
-    const f=e.target.files[0];if(!f)return;
-    const r=new FileReader();
-    r.onload=ev=>{document.getElementById('logoBox').innerHTML='<img src="'+ev.target.result+'" alt="logo">';};
-    r.readAsDataURL(f);
-  }
+  document.querySelectorAll('.seg').forEach(s=>s.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;s.querySelectorAll('button').forEach(x=>x.classList.remove('on'));b.classList.add('on');}));
+  function loadLogo(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{document.querySelectorAll('.logo-box,.logo-box2').forEach(el=>{el.innerHTML='<img src="'+ev.target.result+'" alt="logo">';});};r.readAsDataURL(f);}
   const fmt=n=>'$'+Math.round(n).toLocaleString('es-MX');
   function calc(){
     const m=+document.getElementById('cMonto').value||0;
-    const p=+document.getElementById('cPlazo').value||1;
-    const t=(+document.getElementById('cTasa').value||0)/100;
-    const freq=document.getElementById('cFreq').value;
-    const interes=m*t*p;
-    const total=m+interes;
-    const pago=total/p;
+    const [n,pct,freq]=document.getElementById('cPlan').value.split('-');
+    const np=+n,factor=+pct/100;
+    const interes=m*factor,total=m+interes,pago=total/np;
     document.getElementById('oPago').textContent=fmt(pago);
     document.getElementById('oCap').textContent=fmt(m);
     document.getElementById('oInt').textContent=fmt(interes);
     document.getElementById('oTot').textContent=fmt(total);
-    document.getElementById('oNum').textContent=p+' '+freq.toLowerCase()+(p>1?'s':'');
+    document.getElementById('oNum').textContent=np+' '+freq.toLowerCase()+(np>1?'es':'');
+    const tb=document.querySelector('#calTbl tbody');tb.innerHTML='';
+    let saldo=total;const step=freq==='Semanal'?7:14;let d=new Date(2026,4,30);
+    for(let i=1;i<=np;i++){d=new Date(d.getTime()+step*864e5);saldo-=pago;tb.innerHTML+='<tr><td>'+i+'</td><td>'+d.toLocaleDateString('es-MX',{day:'2-digit',month:'short'})+'</td><td>'+fmt(pago)+'</td><td>'+fmt(Math.max(0,saldo))+'</td></tr>';}
   }
   calc();
 </script>
